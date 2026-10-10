@@ -116,6 +116,15 @@ body.app-mode .bottom-nav {
 }
 .nav-tab.active {color:var(--purple);background:#eeeaff}
 .nav-icon {font-size:20px}
+
+.post-media {display:block;width:100%;max-height:560px;object-fit:contain;margin-top:12px;border-radius:12px;background:#f1f1f5}
+.post-actions {display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.post-action {border:1px solid var(--border);border-radius:9px;background:white;padding:8px 12px;color:var(--text)}
+.post-action.liked {color:#d6336c;background:#fff0f5;border-color:#ffd0df}
+.comment-list {margin-top:10px;border-top:1px solid var(--border);padding-top:8px}
+.comment-item {font-size:14px;margin:7px 0;overflow-wrap:anywhere}
+.comment-form {display:flex;gap:8px;margin-top:10px}
+.comment-form input {flex:1;min-width:0}
 video {max-width:100%;background:#202236;border-radius:12px}
 .call-videos {display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
 .call-videos video {width:min(100%,400px);max-height:350px}
@@ -215,7 +224,11 @@ video {max-width:100%;background:#202236;border-radius:12px}
   <h2>Create a post</h2>
   <form id="postForm" class="post-form">
     <textarea class="field" id="postContent" maxlength="2000"
-      placeholder="What's on your mind?" required></textarea>
+      placeholder="What's on your mind? (optional if adding media)"></textarea>
+    <label class="field-label" for="postMediaFile">Add photo or video</label>
+    <input class="field" id="postMediaFile" type="file"
+      accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">
+    <p class="muted">Images up to 8 MB; videos up to 25 MB.</p>
     <button class="btn full-width" id="postSubmitBtn" type="submit">Publish post</button>
   </form>
   <p id="postStatus" class="status muted"></p>
@@ -805,7 +818,7 @@ async function openMemberProfile(userId) {
 
     const { data: posts, error } = await db
       .from("posts")
-      .select("id,user_id,content,created_at")
+      .select("id,user_id,content,created_at,media_url,media_type,visibility")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(50);
@@ -875,43 +888,96 @@ async function showFollowList(userId, type) {
 
 function renderPosts(posts, target, profiles = new Map()) {
   target.replaceChildren();
-
-  if (!posts.length) {
-    target.textContent = "No posts yet.";
-    return;
-  }
-
+  if (!posts.length) { target.textContent = "No posts yet."; return; }
   posts.forEach(post => {
-    const card = document.createElement("article");
-    card.className = "post-card";
-
+    const card = document.createElement("article"); card.className = "post-card";
     const profile = profiles.get(post.user_id);
     const author = document.createElement("strong");
     author.textContent = profile?.full_name || "Community member";
-    author.style.cursor = "pointer";
-    author.onclick = () => openMemberProfile(post.user_id);
-
-    const meta = document.createElement("div");
-    meta.className = "post-meta";
+    author.style.cursor = "pointer"; author.onclick = () => openMemberProfile(post.user_id);
+    const meta = document.createElement("div"); meta.className = "post-meta";
     meta.textContent = new Date(post.created_at).toLocaleString();
-
-    const content = document.createElement("div");
-    content.className = "post-content";
-    content.textContent = post.content || "";
-
-    card.append(author, meta, content);
-
-    if (currentUser && post.user_id === currentUser.id) {
-      const removeButton = document.createElement("button");
-      removeButton.className = "small-btn";
-      removeButton.style.marginTop = "12px";
-      removeButton.textContent = "Delete my post";
-      removeButton.onclick = () => deletePost(post.id);
-      card.append(removeButton);
+    card.append(author, meta);
+    if (post.content) { const content = document.createElement("div"); content.className = "post-content"; content.textContent = post.content; card.append(content); }
+    if (post.media_url) {
+      if (post.media_type === "video") {
+        const media = document.createElement("video"); media.className = "post-media";
+        media.controls = true; media.preload = "metadata"; media.src = post.media_url; media.playsInline = true; card.append(media);
+      } else if (post.media_type === "image") {
+        const media = document.createElement("img"); media.className = "post-media";
+        media.src = post.media_url; media.alt = "Post media"; media.loading = "lazy"; card.append(media);
+      }
     }
-
-    target.append(card);
+    const actions = document.createElement("div"); actions.className = "post-actions";
+    const likeButton = document.createElement("button"); likeButton.className = "post-action"; likeButton.textContent = "♡ Like";
+    const likeCount = document.createElement("span"); likeCount.className = "post-meta";
+    const commentCount = document.createElement("span"); commentCount.className = "post-meta";
+    actions.append(likeButton, likeCount, commentCount); card.append(actions);
+    const comments = document.createElement("div"); comments.className = "comment-list"; comments.id = "comments-" + post.id;
+    const commentForm = document.createElement("form"); commentForm.className = "comment-form";
+    const input = document.createElement("input"); input.className = "field"; input.maxLength = 1000; input.placeholder = "Add a comment…"; input.setAttribute("aria-label", "Add a comment");
+    const submit = document.createElement("button"); submit.className = "btn"; submit.textContent = "Send"; submit.type = "submit";
+    commentForm.append(input, submit); card.append(comments, commentForm);
+    likeButton.onclick = () => togglePostLike(post.id, likeButton);
+    commentForm.addEventListener("submit", async event => {
+      event.preventDefault(); const text = input.value.trim(); if (!text || !currentUser) return;
+      submit.disabled = true;
+      try {
+        const { error } = await db.from("post_comments").insert({ post_id: post.id, user_id: currentUser.id, content: text });
+        if (error) throw error;
+        input.value = ""; await loadPostInteractions(post, card);
+      } catch (error) { alert("Could not add comment: " + error.message); }
+      finally { submit.disabled = false; }
+    });
+    if (currentUser && post.user_id === currentUser.id) {
+      const removeButton = document.createElement("button"); removeButton.className = "small-btn"; removeButton.style.marginTop = "12px";
+      removeButton.textContent = "Delete my post"; removeButton.onclick = () => deletePost(post.id); card.append(removeButton);
+    }
+    target.append(card); loadPostInteractions(post, card);
   });
+}
+
+async function loadPostInteractions(post, card) {
+  try {
+    const [{ data: likes, error: likeError }, { data: comments, error: commentError }] = await Promise.all([
+      db.from("post_likes").select("post_id,user_id").eq("post_id", post.id),
+      db.from("post_comments").select("id,post_id,user_id,content,created_at").eq("post_id", post.id).order("created_at", { ascending: true })
+    ]);
+    if (likeError) throw likeError; if (commentError) throw commentError;
+    const likeButton = card.querySelector(".post-action");
+    const counts = card.querySelectorAll(".post-actions .post-meta");
+    const commentBox = card.querySelector(".comment-list");
+    const postLikes = likes || []; const postComments = comments || [];
+    const liked = postLikes.some(row => row.user_id === currentUser?.id);
+    likeButton.textContent = liked ? "♥ Liked" : "♡ Like";
+    likeButton.classList.toggle("liked", liked);
+    counts[0].textContent = `${postLikes.length} like${postLikes.length === 1 ? "" : "s"}`;
+    counts[1].textContent = `${postComments.length} comment${postComments.length === 1 ? "" : "s"}`;
+    commentBox.replaceChildren();
+    postComments.forEach(comment => {
+      const line = document.createElement("div"); line.className = "comment-item";
+      const name = document.createElement("strong"); name.textContent = comment.user_id === currentUser?.id ? "You: " : "Member: ";
+      const body = document.createElement("span"); body.textContent = comment.content; line.append(name, body); commentBox.append(line);
+    });
+  } catch (error) { console.warn("Post interactions could not load:", error.message); }
+}
+
+async function togglePostLike(postId, button) {
+  if (!currentUser) return;
+  button.disabled = true;
+  try {
+    const { data, error } = await db.from("post_likes").select("post_id").eq("post_id", postId).eq("user_id", currentUser.id);
+    if (error) throw error;
+    if (data?.length) {
+      const result = await db.from("post_likes").delete().eq("post_id", postId).eq("user_id", currentUser.id);
+      if (result.error) throw result.error;
+    } else {
+      const result = await db.from("post_likes").insert({ post_id: postId, user_id: currentUser.id });
+      if (result.error) throw result.error;
+    }
+    await loadPostInteractions({ id: postId }, button.closest(".post-card"));
+  } catch (error) { alert("Could not update like: " + error.message); }
+  finally { button.disabled = false; }
 }
 
 async function deletePost(postId) {
@@ -943,7 +1009,7 @@ async function loadPosts() {
   try {
     const { data, error } = await db
       .from("posts")
-      .select("id,user_id,content,created_at")
+      .select("id,user_id,content,created_at,media_url,media_type,visibility")
       .order("created_at", { ascending: false })
       .limit(100);
 
@@ -966,7 +1032,7 @@ async function loadHomePosts() {
   try {
     const { data, error } = await db
       .from("posts")
-      .select("id,user_id,content,created_at")
+      .select("id,user_id,content,created_at,media_url,media_type,visibility")
       .order("created_at", { ascending: false })
       .limit(30);
 
@@ -990,28 +1056,35 @@ $("refreshMembersBtn").onclick = loadCommunityMembers;
 
 $("postForm").addEventListener("submit", async event => {
   event.preventDefault();
-
   const content = $("postContent").value.trim();
-  if (!content || !currentUser) return;
-
+  const file = $("postMediaFile").files[0];
+  if (!currentUser) return;
+  if (!content && !file) { status("postStatus", "Write something or choose a photo/video."); return; }
+  if (file) {
+    const isImage = file.type.startsWith("image/"), isVideo = file.type.startsWith("video/");
+    if (!isImage && !isVideo) { status("postStatus", "Choose a supported image or video file."); return; }
+    if (isImage && file.size > 8 * 1024 * 1024) { status("postStatus", "Images must be 8 MB or smaller."); return; }
+    if (isVideo && file.size > 25 * 1024 * 1024) { status("postStatus", "Videos must be 25 MB or smaller."); return; }
+  }
   $("postSubmitBtn").disabled = true;
-
   try {
-    const { error } = await db.from("posts").insert({
-      user_id: currentUser.id,
-      content
-    });
-
+    let mediaUrl = null, mediaType = "text";
+    if (file) {
+      status("postStatus", "Uploading media...");
+      const extension = (file.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const path = currentUser.id + "/" + Date.now() + "." + extension;
+      const { error: uploadError } = await db.storage.from("post-media").upload(path, file, { contentType: file.type, upsert: false });
+      if (uploadError) throw uploadError;
+      mediaUrl = db.storage.from("post-media").getPublicUrl(path).data.publicUrl;
+      mediaType = file.type.startsWith("video/") ? "video" : "image";
+    }
+    const { error } = await db.from("posts").insert({ user_id: currentUser.id, content, media_url: mediaUrl, media_type: mediaType, visibility: "public" });
     if (error) throw error;
-
-    $("postContent").value = "";
+    $("postContent").value = ""; $("postMediaFile").value = "";
     status("postStatus", "Post published!");
     await Promise.all([loadPosts(), loadHomePosts()]);
-  } catch (error) {
-    status("postStatus", "Could not publish: " + error.message);
-  } finally {
-    $("postSubmitBtn").disabled = false;
-  }
+  } catch (error) { status("postStatus", "Could not publish: " + error.message); }
+  finally { $("postSubmitBtn").disabled = false; }
 });
 
 /* Profile picture upload */
