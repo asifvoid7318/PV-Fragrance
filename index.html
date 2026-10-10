@@ -3,198 +3,1798 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b1120">
+<meta name="theme-color" content="#f6f7fb">
 <title>Community Hub</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-:root{--bg:#0b1120;--panel:#121c2e;--panel2:#18253a;--text:#f3f6ff;--muted:#9caec7;--purple:#8b7cff;--green:#44d7b6;--border:rgba(255,255,255,.10)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#312e8150,transparent 35%),radial-gradient(ellipse at 95% 15%,#0e749030,transparent 30%),var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;min-height:100vh}
-a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}button{cursor:pointer}.container{width:min(1100px,92%);margin:auto}
-.navbar{position:sticky;top:0;z-index:5;background:#0b1120ed;backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}.nav-inner{min-height:72px;display:flex;justify-content:space-between;align-items:center;gap:15px}.brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:800}.brand-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,var(--purple),#42c9da);font-size:22px}.nav-links{display:flex;gap:22px;align-items:center;color:var(--muted);font-size:14px}
-.btn{border:1px solid transparent;border-radius:10px;background:linear-gradient(135deg,#8b7cff,#6b65ed);color:white;padding:12px 17px;font-weight:700;display:inline-flex;justify-content:center;align-items:center;gap:8px;transition:transform .2s,opacity .2s}.btn:hover{transform:translateY(-1px)}.btn:disabled{opacity:.55;cursor:wait;transform:none}.secondary{background:var(--panel2);border-color:var(--border)}.danger{background:#a53249}
-.hero{padding:78px 0 65px;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:45px}.eyebrow{display:inline-block;border:1px solid #8b7cff55;background:#8b7cff18;color:#c9c1ff;border-radius:50px;padding:8px 12px;font-size:12px;font-weight:800;letter-spacing:.6px}h1{font-size:clamp(42px,5.5vw,68px);letter-spacing:-2px;line-height:1.08;margin:24px 0 18px}.gradient{background:linear-gradient(100deg,#b0a5ff,#5fe2cb);color:transparent;background-clip:text;-webkit-background-clip:text}.hero p,.muted{color:var(--muted);line-height:1.75}.hero p{max-width:530px;font-size:16px}.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:25px}.hero-art{min-height:300px;display:grid;place-items:center;position:relative}.orb{width:min(280px,70vw);aspect-ratio:1;display:grid;place-items:center;border-radius:50%;font-size:95px;background:radial-gradient(circle at 35% 30%,#c0b7ff,#7767ef 45%,#20375f 78%);box-shadow:0 0 80px #7967ed35,inset -20px -20px 40px #10182780}.float{position:absolute;background:#18253af2;border:1px solid var(--border);border-radius:13px;padding:13px 16px;box-shadow:0 12px 35px #0003;font-size:13px}.float strong{display:block;margin-bottom:5px}.float span{color:var(--muted)}.float-one{top:12px;right:0}.float-two{bottom:15px;left:0}
-.section{padding:40px 0 65px;scroll-margin-top:85px}.section-heading{text-align:center;margin:0 auto 30px;max-width:650px}.section-heading h2{font-size:clamp(27px,4vw,37px)}.section-heading p{color:var(--muted);line-height:1.7}.features{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}.feature,.panel{border:1px solid var(--border);border-radius:18px;background:linear-gradient(145deg,var(--panel),#101827)}.feature{padding:24px}.feature-icon{font-size:27px;margin-bottom:15px}.feature h3{margin:0 0 10px}.feature p{color:var(--muted);font-size:14px;line-height:1.7}.workspace{padding-bottom:65px;scroll-margin-top:85px}.panel{padding:clamp(20px,4vw,34px);margin-bottom:20px;box-shadow:0 20px 60px #0002}.auth-layout{display:grid;grid-template-columns:.9fr 1.1fr;gap:30px}.auth-info h2{font-size:33px;letter-spacing:-1px}.auth-info p{color:var(--muted);line-height:1.8}.form-card{background:#0b1120;border:1px solid var(--border);border-radius:15px;padding:23px}.field-label{display:block;margin:17px 0 8px;font-size:13px;font-weight:700}.field{display:block;width:100%;padding:13px;background:#141f32;color:white;border:1px solid #34435b;border-radius:9px;outline:none}.field:focus{border-color:var(--purple);box-shadow:0 0 0 3px #8b7cff20}textarea.field{resize:vertical;min-height:75px;line-height:1.6}.full-width{width:100%;margin-top:17px}.switch{width:100%;border:0;background:transparent;color:#b8afff;padding:13px 5px 3px}.hidden{display:none!important}.status{font-size:13px;overflow-wrap:anywhere;line-height:1.6}.badge{display:inline-block;background:#44d7b618;border:1px solid #44d7b644;color:#76e8ce;padding:7px 11px;border-radius:50px;font-size:12px;font-weight:800}.dashboard-top,.section-top{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}.dashboard-email{overflow-wrap:anywhere}.action-row{display:flex;gap:9px;flex-wrap:wrap}.divider{border:0;border-top:1px solid var(--border);margin:26px 0}
-.post-form{background:#0b1120;border:1px solid var(--border);border-radius:14px;padding:18px;margin-top:18px}.post-card{border:1px solid var(--border);background:#0d1627;border-radius:14px;padding:19px;margin-top:14px}.post-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.author-row{display:flex;align-items:center;gap:11px;min-width:0}.post-author{font-weight:800;overflow-wrap:anywhere}.post-meta{color:var(--muted);font-size:12px;margin-top:5px}.post-content{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;margin:18px 0}.small-btn{padding:8px 11px;border-radius:8px;border:1px solid var(--border);background:var(--panel2);color:white;font-size:12px}.delete-post{background:#8e2b41}
-.member-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}.member-actions{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:7px}.follow-counts{font-size:11px;color:var(--muted);white-space:nowrap}.follow-btn{min-width:92px}.follow-btn.following{background:#183c3b;border-color:#44d7b655;color:#8af0d8}.member{min-width:0;background:#0b1120;border:1px solid var(--border);border-radius:12px;padding:15px;display:flex;align-items:center;gap:12px}.member-details{min-width:0}.member strong,.member div,.member small{overflow-wrap:anywhere;line-height:1.65}.member-details div,.member small{color:var(--muted)}.empty{text-align:center;padding:24px;color:var(--muted);border:1px dashed #34435b;border-radius:12px;margin-top:15px}
-.avatar{width:46px;height:46px;min-width:46px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#8b7cff,#42c9da);border:1px solid #ffffff30;display:grid;place-items:center;color:white;font-weight:800;font-size:15px;overflow:hidden}.avatar.large{width:76px;height:76px;min-width:76px;font-size:22px}.profile-editor{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:18px}.profile-fields{flex:1;min-width:min(100%,250px)}.hint{font-size:12px;color:var(--muted);line-height:1.6}
-.chat-layout{display:grid;grid-template-columns:minmax(180px,.7fr) minmax(0,1.3fr);gap:18px;margin-top:20px}.chat-message{padding:10px 12px;margin:9px 0;border-radius:12px;background:#18253a;overflow-wrap:anywhere;white-space:pre-wrap}.chat-message.mine{background:#37306e;margin-left:12%}.chat-message strong{display:block;font-size:12px;margin-bottom:5px}.chat-message small{display:block;color:#b7c3d8;font-size:10px;margin-top:6px}.chat-scroll{height:300px;overflow-y:auto;background:#0b1120;border:1px solid var(--border);border-radius:14px;padding:12px}
-footer{border-top:1px solid var(--border);color:var(--muted);padding:25px 0;font-size:13px}.footer-inner{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-@media(max-width:760px){.nav-links{gap:12px}.nav-links a:not(.nav-cta){display:none}.hero{grid-template-columns:1fr;padding-top:55px;gap:10px}.hero-art{min-height:300px}.features{grid-template-columns:1fr}.auth-layout{grid-template-columns:1fr}.member-list{grid-template-columns:1fr}}@media(max-width:600px){.chat-layout{grid-template-columns:1fr}.chat-message.mine{margin-left:5%}}@media(max-width:420px){.brand{font-size:15px}.brand-icon{width:35px;height:35px}.nav-cta{padding:10px;font-size:12px}h1{letter-spacing:-1.4px}}
-
-/* Clean light theme + Instagram-style bottom navigation */
-:root{--bg:#f6f7fb;--panel:#fff;--panel2:#eeeaff;--text:#202236;--muted:#74788b;--purple:#7458e8;--green:#159b78;--border:#e7e8f0}
-body{background:var(--bg);color:var(--text)}.navbar{background:#ffffffed;border-color:var(--border)}
-.feature,.panel{background:#fff;border-color:var(--border);box-shadow:0 8px 28px #24244b0a}
-.field,.form-card,.post-form,.post-card,.member,.chat-scroll{background:#fbfbfe;color:var(--text);border-color:#e1e3ed}.field{color:var(--text)}
-.secondary{background:#eeeaff;color:#7458e8;border-color:#e3ddff}.danger{background:#fff0f2;color:#c63852}.small-btn{background:#fff;color:#4b4d61;border-color:var(--border)}
-.chat-message{background:#efeff6;color:#202236}.chat-message.mine{background:#e9e3ff}.chat-message small{color:#74788b}.badge{background:#eaf8f3;color:#128363;border-color:#cceee2}.empty{border-color:#d8dbea}
-.home-welcome{padding:24px;background:linear-gradient(135deg,#f0edff,#e9fbf7);border-radius:15px;color:#282346}.home-welcome p{color:#6f6b8d;line-height:1.65}
-.bottom-nav{display:none}body.app-mode{background:#f6f7fb;padding-bottom:80px}
-body.app-mode .navbar,body.app-mode #home.hero,body.app-mode #features,body.app-mode footer{display:none!important}
-body.app-mode .workspace{width:min(760px,94%);padding-top:10px;padding-bottom:90px}
-body.app-mode .panel{padding:clamp(17px,4vw,25px);margin-bottom:12px;border-radius:18px}
-body.app-mode .bottom-nav{display:block;position:fixed;bottom:0;left:0;right:0;z-index:30;background:#ffffffef;backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:7px 8px calc(7px + env(safe-area-inset-bottom))}
-.nav-tabs{width:min(760px,100%);margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.nav-tab{border:0;background:transparent;color:#8b8da0;border-radius:12px;min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:750}.nav-tab .nav-icon{font-size:21px;line-height:1}.nav-tab.active{color:var(--purple);background:#eeeaff}
-@media(min-width:650px){body.app-mode .workspace{padding-top:20px}.nav-tab{min-height:56px}}
-
+:root {
+  --bg:#f6f7fb;
+  --panel:#fff;
+  --text:#202236;
+  --muted:#74788b;
+  --purple:#7458e8;
+  --green:#159b78;
+  --border:#e7e8f0;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  font-family:system-ui,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+button,input,textarea,select {font:inherit}
+button {cursor:pointer}
+button:disabled {opacity:.55;cursor:not-allowed}
+.container {width:min(900px,94%);margin:auto}
+.hidden {display:none!important}
+.muted {color:var(--muted);line-height:1.6}
+.navbar {
+  padding:16px;
+  background:white;
+  border-bottom:1px solid var(--border);
+}
+.brand {font-size:21px;font-weight:800}
+.workspace {padding:18px 0 100px}
+.panel {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:22px;
+  margin-bottom:15px;
+  box-shadow:0 5px 25px #24244b08;
+}
+.btn {
+  border:0;border-radius:10px;padding:11px 15px;
+  background:var(--purple);color:white;font-weight:700;
+}
+.secondary {background:#eeeaff;color:var(--purple)}
+.danger {background:#fff0f2;color:#c63852}
+.field {
+  width:100%;padding:12px;border:1px solid var(--border);
+  border-radius:9px;background:#fbfbfe;color:var(--text);
+}
+.field-label {display:block;margin:14px 0 7px;font-weight:650}
+.full-width {width:100%;margin-top:14px}
+.auth-layout {display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.form-card {background:#fbfbfe;padding:18px;border-radius:13px}
+.section-top,.dashboard-top,.action-row {
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;flex-wrap:wrap;
+}
+.action-row {justify-content:flex-start}
+.status {font-size:13px;overflow-wrap:anywhere}
+.avatar {
+  width:46px;height:46px;min-width:46px;border-radius:50%;
+  display:grid;place-items:center;overflow:hidden;
+  background:#eeeaff;color:var(--purple);font-weight:800;
+}
+.avatar.large {width:84px;height:84px;min-width:84px;font-size:22px}
+.avatar img {width:100%;height:100%;object-fit:cover}
+.profile-editor {display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.member-list {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}
+.member {
+  border:1px solid var(--border);border-radius:12px;padding:13px;
+  display:flex;align-items:center;gap:10px;min-width:0;
+}
+.member-details {min-width:0;overflow-wrap:anywhere;flex:1}
+.member-actions {display:flex;flex-direction:column;gap:6px}
+.small-btn {
+  border:1px solid var(--border);border-radius:8px;
+  padding:8px 10px;background:white;color:var(--text);
+}
+.following {background:#eaf8f3;color:var(--green)}
+.post-form {padding:14px;background:#fbfbfe;border-radius:12px;margin-top:15px}
+.post-card {padding:15px;border:1px solid var(--border);border-radius:12px;margin-top:12px}
+.post-head,.author-row {display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.post-content {white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;margin-top:13px}
+.post-meta,.follow-counts {font-size:12px;color:var(--muted)}
+.divider {border:0;border-top:1px solid var(--border);margin:22px 0}
+.chat-layout {display:grid;grid-template-columns:1fr 2fr;gap:14px}
+.chat-scroll {
+  height:300px;overflow:auto;padding:12px;
+  border:1px solid var(--border);border-radius:12px;background:#fbfbfe;
+}
+.chat-message {padding:10px;margin:8px 0;border-radius:10px;background:#efeff6;overflow-wrap:anywhere}
+.chat-message.mine {background:#e9e3ff;margin-left:12%}
+.empty {padding:22px;text-align:center;color:var(--muted)}
+.bottom-nav {display:none}
+body.app-mode {padding-bottom:80px}
+body.app-mode .navbar {display:none}
+body.app-mode .workspace {padding-top:12px}
+body.app-mode .bottom-nav {
+  display:block;position:fixed;bottom:0;left:0;right:0;
+  background:#ffffffed;border-top:1px solid var(--border);
+  padding:8px 5px calc(8px + env(safe-area-inset-bottom));z-index:20;
+}
+.nav-tabs {display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.nav-tab {
+  border:0;background:transparent;color:#8b8da0;min-height:50px;
+  border-radius:10px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;font-size:11px;
+}
+.nav-tab.active {color:var(--purple);background:#eeeaff}
+.nav-icon {font-size:20px}
+video {max-width:100%;background:#202236;border-radius:12px}
+.call-videos {display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.call-videos video {width:min(100%,400px);max-height:350px}
+.call-videos #localVideo {width:130px;max-height:180px}
+@media(max-width:600px) {
+  .auth-layout,.chat-layout,.member-list {grid-template-columns:1fr}
+  .panel {padding:16px}
+}
 </style>
 </head>
+
 <body>
-<nav class="navbar"><div class="container nav-inner"><a class="brand" href="#home"><span class="brand-icon">✦</span><span>Community Hub</span></a><div class="nav-links"><a href="#home">Home</a><a href="#features">Features</a><a href="#workspace">Community</a><a class="btn nav-cta" href="#workspace">Join Us ↗</a></div></div></nav>
-<main>
-<section class="container hero" id="home"><div><span class="eyebrow">✦ YOUR PEOPLE. YOUR COMMUNITY.</span><h1>Great things<br>happen when<br><span class="gradient">we connect.</span></h1><p>Meet people, share your thoughts and become part of something bigger. Create an account and join the conversation.</p><div class="hero-actions"><a class="btn" href="#workspace">Get Started ↗</a><a class="btn secondary" href="#features">Explore Features</a></div></div><div class="hero-art"><div class="orb">✦</div><div class="float float-one"><strong>✧ A place to belong</strong><span>Connect with your community</span></div><div class="float float-two"><strong>◉ One community</strong><span>Many ideas. Shared growth.</span></div></div></section>
-<section class="container section" id="features"><div class="section-heading"><h2>A community that feels like <span class="gradient">home.</span></h2><p>A space to connect, share ideas and grow together.</p></div><div class="features"><article class="feature"><div class="feature-icon">♧</div><h3>Find Your People</h3><p>Create your account and connect with community members.</p></article><article class="feature"><div class="feature-icon">✧</div><h3>Share Your Thoughts</h3><p>Publish updates and read posts shared by other members.</p></article><article class="feature"><div class="feature-icon">✉</div><h3>Private Chat</h3><p>Send private messages to any registered member.</p></article></div></section>
-<section class="container workspace" id="workspace">
-<section class="panel hidden" id="homePanel"><div class="home-welcome"><span class="eyebrow">YOUR COMMUNITY</span><h2 id="homeWelcome">Welcome to Community Hub ✦</h2><p>Connect with people, share your thoughts, and send private messages—all in one place.</p><button class="btn" type="button" id="homeCreateBtn">＋ Create a post</button></div><div style="margin-top:20px"><div class="section-top"><div><h2>Latest posts</h2><p class="muted">Updates from your community</p></div><button class="btn secondary" id="homeRefreshBtn" type="button">↻ Refresh</button></div><div id="homePostsList"></div></div></section>
-<section class="panel" id="authCard"><div class="auth-layout"><div class="auth-info"><span class="eyebrow">START HERE</span><h2 id="authHeading">Your community is waiting.</h2><p id="authDescription">Create an account to join the community.</p><p>✓ Personal member dashboard</p><p>✓ Publish and read community posts</p><p>✓ Private messages with members</p></div><div class="form-card"><h3 id="formTitle">Create an account</h3><p class="muted" id="formSubtitle">Enter your details below.</p><form id="authForm"><label class="field-label" for="fullName">Full name</label><input class="field" id="fullName" type="text" placeholder="Your full name" autocomplete="name" required><label class="field-label" for="email">Email address</label><input class="field" id="email" type="email" placeholder="you@example.com" autocomplete="email" required><label class="field-label" for="password">Password</label><input class="field" id="password" type="password" placeholder="At least 6 characters" minlength="6" autocomplete="new-password" required><button class="btn full-width" id="submitBtn" type="submit">Create Account ↗</button></form><button class="switch" id="toggleBtn" type="button">Already have an account? Log in</button><p class="status muted" id="status" role="status" aria-live="polite"></p></div></div></section>
-<section class="panel hidden" id="dashboard"><div class="dashboard-top"><div><span class="eyebrow">YOUR SPACE</span><h2 id="welcome">Welcome to Community Hub</h2><p class="muted dashboard-email" id="accountEmail"></p><span class="badge" id="roleText">Member</span></div><div class="action-row"><button class="btn secondary" id="refreshBtn" type="button">↻ Refresh</button><button class="btn danger" id="logoutBtn" type="button">Log Out</button></div></div><hr class="divider"><h3>Your profile</h3><p class="muted">Choose a profile picture. Profile photos are publicly viewable.</p><div class="profile-editor"><div id="profileAvatar" class="avatar large">?</div><div class="profile-fields"><label class="field-label" for="avatarFile">Profile picture</label><input class="field" id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><p class="hint">JPG, PNG, WEBP or GIF · Maximum 3 MB.</p><button class="btn secondary" id="uploadAvatarBtn" type="button">Upload / Update Picture</button></div></div><p class="status muted" id="profileStatus" role="status"></p><hr class="divider"><h3>Your community space</h3><p class="muted">Share an update below or explore posts from other members.</p><p class="status muted" id="dashboardStatus" role="status"></p></section>
-<section class="panel hidden" id="communityMembersPanel"><div class="section-top"><div><span class="eyebrow">MEET MEMBERS</span><h2>Discover people</h2><p class="muted">Follow members or message anyone privately.</p></div><button class="btn secondary" id="refreshMembersBtn" type="button">↻ Refresh Members</button></div><p class="status muted" id="communityMembersStatus" role="status" aria-live="polite"></p><div class="member-list" id="communityMembersList"></div></section>
-<section class="panel hidden" id="chatPanel"><div class="section-top"><div><span class="eyebrow">PRIVATE MESSAGES</span><h2>Community Chat</h2><p class="muted">Any member can message any other member. Following is not required.</p></div><button class="btn secondary" id="refreshChatBtn" type="button">Refresh Chat</button></div><div class="chat-layout"><div><label class="field-label" for="chatMember">Choose a member</label><select class="field" id="chatMember"><option value="">Loading members...</option></select><button class="btn secondary full-width" id="loadChatBtn" type="button">Open Conversation</button></div><div><div id="chatWith" class="muted">Select a member to begin chatting.</div><div id="chatMessages" class="chat-scroll" aria-live="polite">Your private messages appear here.</div><form id="chatForm" class="post-form"><label class="field-label" for="chatMessage">Your message</label><textarea class="field" id="chatMessage" rows="2" maxlength="2000" placeholder="Write a message..." required></textarea><button class="btn full-width" id="sendChatBtn" type="submit">Send Message</button></form><p class="status muted" id="chatStatus" role="status" aria-live="polite"></p></div></div></section>
-<section class="panel hidden" id="postsPanel"><span class="eyebrow">COMMUNITY FEED</span><h2>What's on your mind?</h2><p class="muted">Share an update with your community. Maximum 2,000 characters.</p><form id="postForm" class="post-form"><label class="field-label" for="postContent">Your post</label><textarea class="field" id="postContent" rows="4" maxlength="2000" placeholder="Write something for the community..." required></textarea><button class="btn full-width" id="postSubmitBtn" type="submit">Publish Post ↗</button></form><p class="status muted" id="postStatus" role="status" aria-live="polite"></p><hr class="divider"><div class="section-top"><h3>Recent Posts</h3><button class="btn secondary" id="reloadPostsBtn" type="button">Refresh Feed</button></div><div id="postsList"></div></section>
-<section class="panel hidden" id="adminPanel"><div class="section-top"><div><span class="eyebrow">ADMINISTRATION</span><h2>Member Directory</h2><p class="muted">Registered community profiles</p></div><span class="badge">Admin access</span></div><h3 id="memberCount">Loading members...</h3><div class="member-list" id="membersList"></div><p class="status muted" id="adminStatus" role="status"></p></section>
-</section></main>
-<nav class="bottom-nav" id="bottomNav" aria-label="Main navigation"><div class="nav-tabs"><button class="nav-tab active" data-page="home" type="button"><span class="nav-icon">⌂</span><span>Home</span></button><button class="nav-tab" data-page="explore" type="button"><span class="nav-icon">⌕</span><span>Explore</span></button><button class="nav-tab" data-page="create" type="button"><span class="nav-icon">＋</span><span>Create</span></button><button class="nav-tab" data-page="messages" type="button"><span class="nav-icon">✉</span><span>Messages</span></button><button class="nav-tab" data-page="profile" type="button"><span class="nav-icon">◎</span><span>Profile</span></button></div></nav>
-<footer><div class="container footer-inner"><span>✦ Community Hub</span><span>Connect. Share. Belong. · © 2026</span></div></footer>
+<nav class="navbar">
+  <div class="container brand">✦ Community Hub</div>
+</nav>
+
+<main class="container workspace">
+
+<section class="panel" id="authCard">
+  <div class="auth-layout">
+    <div>
+      <h2 id="authHeading">Your community is waiting.</h2>
+      <p class="muted" id="authDescription">Create an account to join.</p>
+      <p>✓ Member profiles</p>
+      <p>✓ Posts and followers</p>
+      <p>✓ Private chat and calls</p>
+    </div>
+    <div class="form-card">
+      <h3 id="formTitle">Create an account</h3>
+      <form id="authForm">
+        <label class="field-label" for="fullName">Full name</label>
+        <input class="field" id="fullName" autocomplete="name" required>
+
+        <label class="field-label" for="email">Email</label>
+        <input class="field" id="email" type="email" autocomplete="email" required>
+
+        <label class="field-label" for="password">Password</label>
+        <input class="field" id="password" type="password"
+          minlength="6" autocomplete="current-password" required>
+
+        <button class="btn full-width" id="submitBtn" type="submit">Create account</button>
+      </form>
+      <button class="btn secondary full-width" id="toggleBtn" type="button">
+        Already registered? Log in
+      </button>
+      <p id="status" class="status muted" role="status"></p>
+    </div>
+  </div>
+</section>
+
+<section class="panel hidden" id="homePanel">
+  <h2 id="homeWelcome">Welcome to Community Hub ✦</h2>
+  <p class="muted">Connect and share with your community.</p>
+  <button class="btn" id="homeCreateBtn">＋ Create a post</button>
+  <h3>Latest posts</h3>
+  <div id="homePostsList"></div>
+  <button class="btn secondary full-width" id="homeRefreshBtn">Refresh feed</button>
+</section>
+
+<section class="panel hidden" id="dashboard">
+  <div class="dashboard-top">
+    <div>
+      <h2 id="welcome">Your profile</h2>
+      <p class="muted" id="accountEmail"></p>
+      <span id="roleText">Member</span>
+    </div>
+    <div class="action-row">
+      <button class="btn secondary" id="refreshBtn">Refresh</button>
+      <button class="btn danger" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <h3>Your profile picture</h3>
+  <div class="profile-editor">
+    <div id="profileAvatar" class="avatar large">?</div>
+    <div style="flex:1;min-width:200px">
+      <input class="field" id="avatarFile" type="file"
+        accept="image/png,image/jpeg,image/webp">
+      <button class="btn secondary full-width" id="uploadAvatarBtn">Upload picture</button>
+    </div>
+  </div>
+  <p id="profileStatus" class="status muted"></p>
+  <p id="dashboardStatus" class="status muted"></p>
+</section>
+
+<section class="panel hidden" id="communityMembersPanel">
+  <div class="section-top">
+    <h2>Discover people</h2>
+    <button class="btn secondary" id="refreshMembersBtn">Refresh</button>
+  </div>
+  <p id="communityMembersStatus" class="status muted"></p>
+  <div class="member-list" id="communityMembersList"></div>
+</section>
+
+<section class="panel hidden" id="postsPanel">
+  <h2>Create a post</h2>
+  <form id="postForm" class="post-form">
+    <textarea class="field" id="postContent" maxlength="2000"
+      placeholder="What's on your mind?" required></textarea>
+    <button class="btn full-width" id="postSubmitBtn" type="submit">Publish post</button>
+  </form>
+  <p id="postStatus" class="status muted"></p>
+  <div class="section-top">
+    <h3>Recent posts</h3>
+    <button class="btn secondary" id="reloadPostsBtn">Refresh feed</button>
+  </div>
+  <div id="postsList"></div>
+</section>
+
+<section class="panel hidden" id="chatPanel">
+  <h2>Private messages</h2>
+  <label class="field-label" for="chatMember">Choose a member</label>
+  <select class="field" id="chatMember">
+    <option value="">Choose a member</option>
+  </select>
+  <button class="btn secondary full-width" id="loadChatBtn">Open conversation</button>
+  <p id="chatWith" class="muted"></p>
+  <div id="chatMessages" class="chat-scroll"></div>
+  <form id="chatForm" class="post-form">
+    <textarea class="field" id="chatMessage" maxlength="2000"
+      required placeholder="Write a message"></textarea>
+    <button class="btn full-width" id="sendChatBtn" type="submit">Send</button>
+  </form>
+  <p id="chatStatus" class="status muted"></p>
+</section>
+
+<section class="panel hidden" id="adminPanel">
+  <h2>Admin member directory</h2>
+  <h3 id="memberCount"></h3>
+  <div class="member-list" id="membersList"></div>
+  <p id="adminStatus" class="status muted"></p>
+</section>
+
+<section class="panel hidden" id="memberProfilePanel">
+  <div class="section-top">
+    <h2>Member profile</h2>
+    <button class="btn secondary" id="closeMemberProfile">Back</button>
+  </div>
+  <div class="profile-editor">
+    <div id="memberProfileAvatar" class="avatar large">?</div>
+    <div style="flex:1;min-width:220px">
+      <h2 id="memberProfileName">Member</h2>
+      <p id="memberProfileBio" class="muted">Community member</p>
+      <div id="memberProfileCounts" class="muted"></div>
+      <div class="action-row" style="margin-top:12px">
+        <button class="btn secondary" id="memberProfileFollow">Follow</button>
+        <button class="btn secondary" id="memberProfileFollowers">Followers</button>
+        <button class="btn secondary" id="memberProfileFollowing">Following</button>
+        <button class="btn" id="memberProfileMessage">Message</button>
+        <button class="btn" id="memberAudioCall">Audio call</button>
+        <button class="btn" id="memberVideoCall">Video call</button>
+      </div>
+    </div>
+  </div>
+  <div id="memberProfileList" class="member-list"></div>
+  <h3>Posts</h3>
+  <div id="memberProfilePosts"></div>
+  <p id="memberProfileStatus" class="status muted"></p>
+</section>
+
+<section class="panel hidden" id="callPanel">
+  <div class="section-top">
+    <h2 id="callTitle">Audio / video call</h2>
+    <button class="btn secondary" id="hideCallBtn">Hide panel</button>
+  </div>
+  <p id="callStatus" class="status muted" role="status">Call status</p>
+  <div class="call-videos">
+    <video id="remoteVideo" autoplay playsinline></video>
+    <video id="localVideo" autoplay muted playsinline></video>
+  </div>
+  <audio id="remoteAudio" autoplay></audio>
+  <div id="incomingCallActions" class="action-row hidden">
+    <button class="btn" id="acceptCallBtn">Accept</button>
+    <button class="btn danger" id="rejectCallBtn">Reject</button>
+  </div>
+  <div id="activeCallActions" class="action-row hidden">
+    <button class="btn secondary" id="muteCallBtn">Mute mic</button>
+    <button class="btn secondary" id="cameraCallBtn">Camera off</button>
+    <button class="btn danger" id="endCallBtn">End call</button>
+  </div>
+</section>
+
+</main>
+
+<nav class="bottom-nav" id="bottomNav" aria-label="Main navigation">
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-page="home"><span class="nav-icon">⌂</span>Home</button>
+    <button class="nav-tab" data-page="explore"><span class="nav-icon">⌕</span>Explore</button>
+    <button class="nav-tab" data-page="create"><span class="nav-icon">＋</span>Create</button>
+    <button class="nav-tab" data-page="messages"><span class="nav-icon">✉</span>Messages</button>
+    <button class="nav-tab" data-page="profile"><span class="nav-icon">◎</span>Profile</button>
+  </div>
+</nav>
+
 <script>
+"use strict";
+
+/* Supabase connection */
 const SUPABASE_URL = "https://gfaaqnsefpmqgkhpjynz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_uXdURlowTgeKFuqvISrXVA_dpdD4ANg";
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const $ = id => document.getElementById(id);
-let loginMode=false,busy=false,currentUser=null,currentProfile=null,loadingDashboard=false,selectedChatUser=null,chatChannel=null;
 
-function setStatus(id,message){$(id).textContent=message}
-function setHidden(id,hidden){$(id).classList.toggle("hidden",hidden)}
-function showPage(page){const map={home:"homePanel",explore:"communityMembersPanel",create:"postsPanel",messages:"chatPanel",profile:"dashboard"};Object.entries(map).forEach(([key,id])=>setHidden(id,key!==page));if(currentProfile?.is_admin===true)setHidden("adminPanel",page!=="profile");document.querySelectorAll(".nav-tab").forEach(b=>b.classList.toggle("active",b.dataset.page===page));if(page==="messages")loadChatMembers();if(page==="home")loadHomePosts();window.scrollTo({top:0,behavior:"smooth"})}
-document.querySelectorAll(".nav-tab").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
-function initials(name){return (name||"Member").trim().split(/\s+/).filter(Boolean).slice(0,2).map(w=>Array.from(w)[0].toUpperCase()).join("")||"M"}
-function makeAvatar(name,url,large=false){
- const el=document.createElement("div");el.className="avatar"+(large?" large":"");el.textContent=initials(name);
- if(url){const img=document.createElement("img");img.src=url;img.alt=(name||"Member")+" profile picture";img.style.cssText="width:100%;height:100%;object-fit:cover;border-radius:50%";img.onerror=()=>img.replaceWith(document.createTextNode(initials(name)));el.replaceChildren(img)}
- return el
+const $ = id => document.getElementById(id);
+const hide = (id, value) => $(id).classList.toggle("hidden", value);
+const status = (id, message) => { $(id).textContent = message || ""; };
+
+let currentUser = null;
+let currentProfile = null;
+let loginMode = false;
+let busy = false;
+let dashboardLoading = false;
+let selectedChatUser = null;
+let profileTarget = null;
+
+let chatChannel = null;
+let callChannel = null;
+let iceChannel = null;
+let incomingChannel = null;
+
+let pc = null;
+let localStream = null;
+let activeCall = null;
+let incomingCall = null;
+let callType = "audio";
+let isCaller = false;
+let pendingCandidates = [];
+let remoteDescriptionSet = false;
+let micMuted = false;
+let cameraOff = false;
+let seenIncomingCalls = new Set();
+
+const rtcConfig = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" }
+  ]
+};
+
+function initials(name) {
+  return (name || "Member").trim().split(/\s+/)
+    .slice(0, 2).map(s => s[0]?.toUpperCase() || "").join("") || "M";
 }
-function setProfileAvatar(name,url){$("profileAvatar").replaceChildren();$("profileAvatar").textContent=initials(name);if(url){const img=document.createElement("img");img.src=url;img.alt="Your profile picture";img.style.cssText="width:100%;height:100%;object-fit:cover;border-radius:50%";img.onerror=()=>{$("profileAvatar").replaceChildren(document.createTextNode(initials(name)))};$("profileAvatar").appendChild(img)}}
-function setAuthMode(){
- $("authHeading").textContent=loginMode?"Welcome back.":"Your community is waiting."; $("authDescription").textContent=loginMode?"Sign in to access your community account.":"Create an account to join the community.";
- $("formTitle").textContent=loginMode?"Log in to your account":"Create an account";$("formSubtitle").textContent=loginMode?"Enter your account details below.":"Enter your details below.";
- $("fullName").classList.toggle("hidden",loginMode);$("fullName").required=!loginMode;$("submitBtn").textContent=loginMode?"Log In ↗":"Create Account ↗";$("toggleBtn").textContent=loginMode?"New here? Create an account":"Already have an account? Log in";$("password").autocomplete=loginMode?"current-password":"new-password";setStatus("status","")
-}
-$("toggleBtn").addEventListener("click",()=>{if(busy)return;loginMode=!loginMode;setAuthMode()});
-$("authForm").addEventListener("submit",async e=>{
- e.preventDefault();if(busy)return;busy=true;$("submitBtn").disabled=true;$("toggleBtn").disabled=true;setStatus("status","Please wait...");
- try{const email=$("email").value.trim(),password=$("password").value;
-  if(loginMode){const {error}=await db.auth.signInWithPassword({email,password});if(error)throw error;setStatus("status","Login successful!");await loadDashboard()}
-  else{const fullName=$("fullName").value.trim();const {data,error}=await db.auth.signUp({email,password,options:{data:{full_name:fullName}}});if(error)throw error;if(data.session){setStatus("status","Account created successfully!");await loadDashboard()}else{loginMode=true;setAuthMode();setStatus("status","Account created. Check your email for confirmation, then log in.")}}
- }catch(err){setStatus("status","Error: "+err.message)}finally{busy=false;$("submitBtn").disabled=false;$("toggleBtn").disabled=false}
-});
-async function loadDashboard(){
- if(loadingDashboard)return;loadingDashboard=true;
- try{
-  const {data:s,error:se}=await db.auth.getSession();if(se)throw se;currentUser=s.session?.user||null;currentProfile=null;
-  if(!currentUser){document.body.classList.remove("app-mode");["homePanel","dashboard","communityMembersPanel","chatPanel","postsPanel","adminPanel"].forEach(id=>setHidden(id,true));setHidden("authCard",false);return}
-  document.body.classList.add("app-mode");["homePanel","dashboard","communityMembersPanel","chatPanel","postsPanel"].forEach(id=>setHidden(id,false));setHidden("authCard",true);setHidden("adminPanel",true);
-  $("accountEmail").textContent="Email: "+(currentUser.email||"");$("roleText").textContent="Loading profile...";setStatus("dashboardStatus","");
-  const {data:p,error:pe}=await db.from("profiles").select("full_name,email,is_admin,avatar_url").eq("id",currentUser.id).maybeSingle();if(pe)throw pe;
-  if(!p){$("roleText").textContent="Member";setStatus("dashboardStatus","Profile not available yet. Refresh in a moment.");return}
-  currentProfile=p;const name=p.full_name||currentUser.user_metadata?.full_name||"Member";$("welcome").textContent="Welcome, "+name;setProfileAvatar(name,p.avatar_url);
-  if(p.is_admin===true){$("roleText").textContent="Administrator";setHidden("adminPanel",false);await loadMembers()}else $("roleText").textContent="Community Member";
-  await Promise.all([loadCommunityMembers(),loadPosts(),loadChatMembers()]);$("homeWelcome").textContent="Welcome, "+name+" ✦";showPage("home");
- }finally{loadingDashboard=false}
-}
-async function loadHomePosts(){if(!currentUser)return;const list=$("homePostsList");list.replaceChildren();const {data:posts,error}=await db.from("posts").select("id,user_id,content,created_at").order("created_at",{ascending:false}).limit(30);if(error){list.textContent="Could not load posts: "+error.message;return}if(!posts?.length){const e=document.createElement("div");e.className="empty";e.textContent="No posts yet. Go to Create and share the first update!";list.append(e);return}const ids=[...new Set(posts.map(p=>p.user_id).filter(Boolean))],profiles=new Map();if(ids.length){const {data}=await db.from("member_public_profiles").select("user_id,full_name,avatar_url").in("user_id",ids);for(const p of data||[])profiles.set(p.user_id,p)}for(const p of posts){const profile=profiles.get(p.user_id),card=document.createElement("article");card.className="post-card";const head=document.createElement("div");head.className="post-head";const row=document.createElement("div");row.className="author-row";row.appendChild(makeAvatar(profile?.full_name||"Community member",profile?.avatar_url));const details=document.createElement("div"),name=document.createElement("div"),time=document.createElement("div");name.className="post-author";name.textContent=profile?.full_name||"Community member";time.className="post-meta";time.textContent=new Date(p.created_at).toLocaleString();details.append(name,time);row.append(details);head.append(row);const content=document.createElement("div");content.className="post-content";content.textContent=p.content;card.append(head,content);list.append(card)}}
-$("homeCreateBtn").addEventListener("click",()=>showPage("create"));$("homeRefreshBtn").addEventListener("click",loadHomePosts);
-async function loadCommunityMembers(){
- if(!currentUser)return;const list=$("communityMembersList");list.replaceChildren();setStatus("communityMembersStatus","Loading members...");
- try{
-  const {data:members,error:me}=await db.from("member_public_profiles").select("user_id,full_name,avatar_url,created_at").order("created_at",{ascending:false});if(me)throw me;
-  const {data:follows,error:fe}=await db.from("follows").select("follower_id,following_id");if(fe)throw fe;
-  const all=follows||[],following=new Set(all.filter(f=>f.follower_id===currentUser.id).map(f=>f.following_id)),fc=new Map(),gc=new Map();
-  for(const f of all){fc.set(f.following_id,(fc.get(f.following_id)||0)+1);gc.set(f.follower_id,(gc.get(f.follower_id)||0)+1)}
-  const others=(members||[]).filter(m=>m.user_id!==currentUser.id);setStatus("communityMembersStatus",others.length?`Showing ${others.length} other member(s).`:"No other members yet. Invite someone!");
-  if(!others.length){const empty=document.createElement("div");empty.className="empty";empty.textContent="No other members yet.";list.appendChild(empty);return}
-  for(const m of others){const card=document.createElement("article");card.className="member";card.appendChild(makeAvatar(m.full_name,m.avatar_url));const d=document.createElement("div");d.className="member-details";const n=document.createElement("strong");n.textContent=m.full_name||"Community member";const counts=document.createElement("div");counts.className="follow-counts";counts.textContent=`${fc.get(m.user_id)||0} followers · ${gc.get(m.user_id)||0} following`;d.append(n,counts);
-   const actions=document.createElement("div");actions.className="member-actions";const fb=document.createElement("button");fb.type="button";fb.className="small-btn follow-btn"+(following.has(m.user_id)?" following":"");fb.textContent=following.has(m.user_id)?"Following":"Follow";fb.addEventListener("click",()=>toggleFollow(m.user_id,fb));
-   const mb=document.createElement("button");mb.type="button";mb.className="small-btn";mb.textContent="Message";mb.addEventListener("click",()=>{$("chatMember").value=m.user_id;openConversation()});actions.append(fb,mb);card.append(d,actions);list.appendChild(card)
+
+function avatar(name, url, large = false) {
+  const el = document.createElement("div");
+  el.className = "avatar" + (large ? " large" : "");
+  el.textContent = initials(name);
+
+  if (url) {
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = "Profile picture";
+    img.onerror = () => {
+      img.remove();
+      el.textContent = initials(name);
+    };
+    el.replaceChildren(img);
   }
- }catch(err){setStatus("communityMembersStatus","Could not load members: "+err.message)}
+  return el;
 }
-async function toggleFollow(target,button){
- if(!currentUser||target===currentUser.id)return;const was=button.textContent==="Following";button.disabled=true;
- try{const result=was?await db.from("follows").delete().eq("follower_id",currentUser.id).eq("following_id",target):await db.from("follows").insert({follower_id:currentUser.id,following_id:target});if(result.error)throw result.error;await loadCommunityMembers();setStatus("communityMembersStatus",was?"You unfollowed this member.":"You are now following this member.")}
- catch(err){setStatus("communityMembersStatus","Could not update follow: "+err.message);button.disabled=false}
+
+function replaceAvatar(id, name, url) {
+  const old = $(id);
+  const replacement = avatar(name, url, true);
+  replacement.id = id;
+  old.replaceWith(replacement);
 }
-async function loadMembers(){
- $("membersList").replaceChildren();$("memberCount").textContent="Loading members...";setStatus("adminStatus","");
- const {data,error}=await db.from("member_public_profiles").select("user_id,full_name,avatar_url,created_at").order("created_at",{ascending:false});
- if(error){$("memberCount").textContent="Unable to load members";setStatus("adminStatus",error.message);return}
- $("memberCount").textContent="Registered profiles: "+data.length;
- for(const m of data){const card=document.createElement("article");card.className="member";card.appendChild(makeAvatar(m.full_name,m.avatar_url));const d=document.createElement("div");d.className="member-details";const n=document.createElement("strong");n.textContent=m.full_name||"Unnamed member";const date=document.createElement("small");date.textContent=m.created_at?"Joined: "+new Date(m.created_at).toLocaleDateString():"";d.append(n,date);card.appendChild(d);$("membersList").appendChild(card)}
+
+function setPageVisibility(page) {
+  const pages = {
+    home: "homePanel",
+    explore: "communityMembersPanel",
+    create: "postsPanel",
+    messages: "chatPanel",
+    profile: "dashboard"
+  };
+
+  Object.values(pages).forEach(id => hide(id, true));
+  hide("adminPanel", true);
+  hide("memberProfilePanel", true);
+
+  if (pages[page]) hide(pages[page], false);
+
+  if (page === "profile" && currentProfile?.is_admin === true) {
+    hide("adminPanel", false);
+  }
+
+  document.querySelectorAll(".nav-tab").forEach(button => {
+    button.classList.toggle("active", button.dataset.page === page);
+  });
 }
-async function loadPosts(){
- $("postsList").replaceChildren();setStatus("postStatus","Loading posts...");const {data:posts,error}=await db.from("posts").select("id,user_id,content,created_at").order("created_at",{ascending:false}).limit(100);
- if(error){setStatus("postStatus","Could not load posts: "+error.message);return}setStatus("postStatus",posts.length?posts.length+" recent post(s)":"Be the first to share something!");
- if(!posts.length){const empty=document.createElement("div");empty.className="empty";empty.textContent="No posts yet. Start the conversation!";$("postsList").appendChild(empty);return}
- const ids=[...new Set(posts.map(p=>p.user_id).filter(Boolean))],map=new Map();
- if(ids.length){const {data:profiles,error:pe}=await db.from("member_public_profiles").select("user_id,full_name,avatar_url").in("user_id",ids);if(!pe)for(const p of profiles||[])map.set(p.user_id,p)}
- for(const post of posts){const card=document.createElement("article");card.className="post-card";const head=document.createElement("div");head.className="post-head";const ar=document.createElement("div");ar.className="author-row";const p=map.get(post.user_id),own=post.user_id===currentUser?.id,admin=currentProfile?.is_admin===true,name=p?.full_name||(own?currentProfile?.full_name||currentUser?.user_metadata?.full_name:null)||"Community member";ar.appendChild(makeAvatar(name,p?.avatar_url||(own?currentProfile?.avatar_url:null)));const tb=document.createElement("div"),author=document.createElement("div");author.className="post-author";author.textContent=name;const meta=document.createElement("div");meta.className="post-meta";meta.textContent=new Date(post.created_at).toLocaleString();tb.append(author,meta);ar.appendChild(tb);head.appendChild(ar);
-  if(own||admin){const del=document.createElement("button");del.className="small-btn delete-post";del.textContent="Delete";del.addEventListener("click",()=>deletePost(post.id,del));head.appendChild(del)}
-  const content=document.createElement("div");content.className="post-content";content.textContent=post.content;card.append(head,content);$("postsList").appendChild(card)
- }
+
+function showPage(page) {
+  if (!currentUser) return;
+  hide("callPanel", true);
+  setPageVisibility(page);
+
+  if (page === "messages") loadChatMembers();
+  if (page === "home") loadHomePosts();
+  if (page === "explore") loadCommunityMembers();
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
-$("uploadAvatarBtn").addEventListener("click",async()=>{
- if(!currentUser){setStatus("profileStatus","Please log in first.");return}const file=$("avatarFile").files[0];if(!file){setStatus("profileStatus","Choose a picture first.");return}
- const types={"image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/gif":"gif"};if(!types[file.type]){setStatus("profileStatus","Choose JPG, PNG, WEBP or GIF.");return}if(file.size>3*1024*1024){setStatus("profileStatus","Image must be 3 MB or smaller.");return}
- const btn=$("uploadAvatarBtn");btn.disabled=true;setStatus("profileStatus","Uploading picture...");
- try{const path=currentUser.id+"/"+Date.now()+"."+types[file.type];const {error:ue}=await db.storage.from("avatars").upload(path,file,{contentType:file.type,upsert:false});if(ue)throw ue;const {data:u}=db.storage.from("avatars").getPublicUrl(path);const {data:p,error:pe}=await db.from("profiles").update({avatar_url:u.publicUrl}).eq("id",currentUser.id).select("full_name,email,is_admin,avatar_url").single();if(pe)throw pe;currentProfile=p;setProfileAvatar(p.full_name||"Member",p.avatar_url);$("avatarFile").value="";setStatus("profileStatus","Profile picture updated!");await Promise.all([loadPosts(),loadCommunityMembers()])
- }catch(err){setStatus("profileStatus","Upload failed: "+err.message)}finally{btn.disabled=false}
+
+document.querySelectorAll(".nav-tab").forEach(button => {
+  button.addEventListener("click", () => showPage(button.dataset.page));
 });
-$("postForm").addEventListener("submit",async e=>{
- e.preventDefault();if(!currentUser){setStatus("postStatus","Please log in.");return}const content=$("postContent").value.trim();if(!content||content.length>2000){setStatus("postStatus","Write between 1 and 2000 characters.");return}
- $("postSubmitBtn").disabled=true;setStatus("postStatus","Publishing...");
- try{const {error}=await db.from("posts").insert({user_id:currentUser.id,content});if(error)throw error;$("postContent").value="";setStatus("postStatus","Post published!");await loadPosts()}catch(err){setStatus("postStatus","Could not publish: "+err.message)}finally{$("postSubmitBtn").disabled=false}
+
+/* Login and registration */
+
+function setAuthMode() {
+  $("authHeading").textContent = loginMode
+    ? "Welcome back." : "Your community is waiting.";
+
+  $("authDescription").textContent = loginMode
+    ? "Log in to your community account."
+    : "Create an account to join.";
+
+  $("formTitle").textContent = loginMode ? "Log in" : "Create an account";
+  $("fullName").classList.toggle("hidden", loginMode);
+  $("fullName").required = !loginMode;
+  $("password").autocomplete = loginMode ? "current-password" : "new-password";
+  $("submitBtn").textContent = loginMode ? "Log in" : "Create account";
+  $("toggleBtn").textContent = loginMode
+    ? "New here? Create an account"
+    : "Already registered? Log in";
+
+  status("status", "");
+}
+
+$("toggleBtn").addEventListener("click", () => {
+  loginMode = !loginMode;
+  setAuthMode();
 });
-async function deletePost(id,button){if(!confirm("Delete this post?"))return;button.disabled=true;try{const {error}=await db.from("posts").delete().eq("id",id);if(error)throw error;await loadPosts()}catch(err){setStatus("postStatus","Could not delete: "+err.message)}finally{button.disabled=false}}
-/* PRIVATE CHAT: expects public.messages(id, sender_id, receiver_id, content, created_at). */
-async function loadChatMembers(){
- if(!currentUser)return;const select=$("chatMember");select.replaceChildren();const placeholder=document.createElement("option");placeholder.value="";placeholder.textContent="Choose a member";select.appendChild(placeholder);
- const {data,error}=await db.from("member_public_profiles").select("user_id,full_name").order("full_name");
- if(error){setStatus("chatStatus","Could not load chat members: "+error.message);return}
- for(const m of data||[]){if(m.user_id===currentUser.id)continue;const opt=document.createElement("option");opt.value=m.user_id;opt.textContent=m.full_name||"Community member";select.appendChild(opt)}
- if(select.options.length===1)setStatus("chatStatus","No other members yet.")
-}
-$("loadChatBtn").addEventListener("click",openConversation);
-$("refreshChatBtn").addEventListener("click",async()=>{await loadChatMembers();if(selectedChatUser)await loadMessages()});
-async function openConversation(){
- if(!currentUser){setStatus("chatStatus","Please log in first.");return}const target=$("chatMember").value;if(!target){setStatus("chatStatus","Choose a member first.");return}
- selectedChatUser=target;const name=$("chatMember").selectedOptions[0]?.textContent||"Member";$("chatWith").textContent="Private conversation with "+name;await loadMessages();subscribeToChat()
-}
-async function loadMessages(){
- if(!currentUser||!selectedChatUser)return;const box=$("chatMessages");box.replaceChildren();setStatus("chatStatus","Loading messages...");
- const {data:messages,error}=await db.from("messages").select("id,sender_id,receiver_id,content,created_at").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedChatUser}),and(sender_id.eq.${selectedChatUser},receiver_id.eq.${currentUser.id})`).order("created_at",{ascending:true}).limit(200);
- if(error){setStatus("chatStatus","Could not load messages: "+error.message+" (check the messages table and RLS policies).");return}
- if(!messages?.length){box.textContent="No messages yet. Say hello!";setStatus("chatStatus","");return}
- for(const m of messages){const item=document.createElement("div");item.className="chat-message"+(m.sender_id===currentUser.id?" mine":"");const who=document.createElement("strong");who.textContent=m.sender_id===currentUser.id?"You":$("chatMember").selectedOptions[0]?.textContent||"Member";const body=document.createElement("div");body.textContent=m.content;const time=document.createElement("small");time.textContent=new Date(m.created_at).toLocaleString();item.append(who,body,time);box.appendChild(item)}
- box.scrollTop=box.scrollHeight;setStatus("chatStatus","")
-}
-async function subscribeToChat(){
- if(chatChannel){await db.removeChannel(chatChannel);chatChannel=null}if(!currentUser||!selectedChatUser)return;
- chatChannel=db.channel("private-chat-"+[currentUser.id,selectedChatUser].sort().join("-")).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},payload=>{
-  const m=payload.new;if((m.sender_id===currentUser.id&&m.receiver_id===selectedChatUser)||(m.sender_id===selectedChatUser&&m.receiver_id===currentUser.id))loadMessages()
- }).subscribe()
-}
-$("chatForm").addEventListener("submit",async e=>{
- e.preventDefault();if(!currentUser){setStatus("chatStatus","Please log in.");return}if(!selectedChatUser){setStatus("chatStatus","Open a conversation first.");return}
- const content=$("chatMessage").value.trim();if(!content||content.length>2000){setStatus("chatStatus","Message must be between 1 and 2000 characters.");return}
- const btn=$("sendChatBtn");btn.disabled=true;setStatus("chatStatus","Sending...");
- try{const {error}=await db.from("messages").insert({sender_id:currentUser.id,receiver_id:selectedChatUser,content});if(error)throw error;$("chatMessage").value="";await loadMessages();setStatus("chatStatus","Message sent.")}
- catch(err){setStatus("chatStatus","Could not send message: "+err.message+" — check messages table policies.")}finally{btn.disabled=false}
+
+$("authForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (busy) return;
+
+  busy = true;
+  $("submitBtn").disabled = true;
+  status("status", "Please wait...");
+
+  try {
+    const email = $("email").value.trim();
+    const password = $("password").value;
+
+    if (loginMode) {
+      const { error } = await db.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+
+      status("status", "Login successful. Loading your profile...");
+      await loadDashboard();
+    } else {
+      const full_name = $("fullName").value.trim();
+
+      const { data, error } = await db.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name } }
+      });
+
+      if (error) throw error;
+
+      if (data.session) {
+        await loadDashboard();
+      } else {
+        loginMode = true;
+        setAuthMode();
+        status(
+          "status",
+          "Account created. Confirm your email if required, then log in."
+        );
+      }
+    }
+  } catch (error) {
+    console.error("Authentication error:", error);
+    status("status", "Sign-in error: " + error.message);
+  } finally {
+    busy = false;
+    $("submitBtn").disabled = false;
+  }
 });
-$("reloadPostsBtn").addEventListener("click",loadPosts);$("refreshMembersBtn").addEventListener("click",loadCommunityMembers);
-$("refreshBtn").addEventListener("click",async()=>{const b=$("refreshBtn");b.disabled=true;try{await loadDashboard()}catch(err){setStatus("dashboardStatus","Refresh error: "+err.message)}finally{b.disabled=false}});
-$("logoutBtn").addEventListener("click",async()=>{
- $("logoutBtn").disabled=true;try{const {error}=await db.auth.signOut();if(error)throw error;if(chatChannel){await db.removeChannel(chatChannel);chatChannel=null}currentUser=null;currentProfile=null;selectedChatUser=null;document.body.classList.remove("app-mode");$("authForm").reset();loginMode=false;setAuthMode();setStatus("status","You have logged out successfully.");["dashboard","communityMembersPanel","chatPanel","postsPanel","adminPanel"].forEach(id=>setHidden(id,true));setHidden("authCard",false);$("authCard").scrollIntoView({behavior:"smooth"})}catch(err){setStatus("dashboardStatus","Logout error: "+err.message)}finally{$("logoutBtn").disabled=false}
+
+/* Profile and application startup */
+
+async function loadDashboard() {
+  if (dashboardLoading) return;
+  dashboardLoading = true;
+
+  try {
+    const { data: sessionData, error: sessionError } = await db.auth.getSession();
+    if (sessionError) throw sessionError;
+
+    currentUser = sessionData.session?.user || null;
+
+    if (!currentUser) {
+      currentProfile = null;
+      document.body.classList.remove("app-mode");
+      hide("authCard", false);
+
+      [
+        "homePanel", "dashboard", "communityMembersPanel",
+        "chatPanel", "postsPanel", "adminPanel",
+        "memberProfilePanel", "callPanel"
+      ].forEach(id => hide(id, true));
+
+      return;
+    }
+
+    document.body.classList.add("app-mode");
+    hide("authCard", true);
+
+    const { data: profile, error: profileError } = await db
+      .from("profiles")
+      .select("id,full_name,email,is_admin,avatar_url")
+      .eq("id", currentUser.id)
+      .maybeSingle();
+
+    if (profileError) throw profileError;
+
+    if (!profile) {
+      hide("authCard", false);
+      status(
+        "status",
+        "Login successful, but your profiles row is missing. Check your Supabase profile creation trigger and RLS policies."
+      );
+      return;
+    }
+
+    currentProfile = profile;
+
+    const name = profile.full_name ||
+      currentUser.user_metadata?.full_name || "Member";
+
+    $("welcome").textContent = name;
+    $("accountEmail").textContent = currentUser.email || "";
+    $("roleText").textContent = profile.is_admin
+      ? "Administrator" : "Community Member";
+    $("homeWelcome").textContent = "Welcome, " + name + " ✦";
+
+    replaceAvatar("profileAvatar", name, profile.avatar_url);
+
+    await Promise.all([
+      loadCommunityMembers(),
+      loadPosts(),
+      loadHomePosts(),
+      loadChatMembers(),
+      profile.is_admin ? loadMembers() : Promise.resolve()
+    ]);
+
+    setPageVisibility("home");
+    await subscribeIncomingCalls();
+  } catch (error) {
+    console.error("Dashboard error:", error);
+    status("status", "Could not load account: " + error.message);
+    hide("authCard", false);
+  } finally {
+    dashboardLoading = false;
+  }
+}
+
+async function loadPublicProfiles(ids) {
+  const map = new Map();
+  const uniqueIds = [...new Set(ids.filter(Boolean))];
+  if (!uniqueIds.length) return map;
+
+  const { data, error } = await db
+    .from("member_public_profiles")
+    .select("user_id,full_name,avatar_url,created_at")
+    .in("user_id", uniqueIds);
+
+  if (error) throw error;
+  (data || []).forEach(profile => map.set(profile.user_id, profile));
+  return map;
+}
+
+async function followCounts() {
+  const { data, error } = await db
+    .from("follows")
+    .select("follower_id,following_id");
+
+  if (error) throw error;
+
+  const rows = data || [];
+  const followers = new Map();
+  const following = new Map();
+
+  rows.forEach(row => {
+    followers.set(
+      row.following_id,
+      (followers.get(row.following_id) || 0) + 1
+    );
+    following.set(
+      row.follower_id,
+      (following.get(row.follower_id) || 0) + 1
+    );
+  });
+
+  return { rows, followers, following };
+}
+
+/* Member directory and following */
+
+async function loadCommunityMembers() {
+  if (!currentUser) return;
+
+  const list = $("communityMembersList");
+  list.replaceChildren();
+  status("communityMembersStatus", "Loading members...");
+
+  try {
+    const { data, error } = await db
+      .from("member_public_profiles")
+      .select("user_id,full_name,avatar_url,created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const counts = await followCounts();
+    const others = (data || []).filter(
+      member => member.user_id !== currentUser.id
+    );
+
+    const followed = new Set(
+      counts.rows
+        .filter(row => row.follower_id === currentUser.id)
+        .map(row => row.following_id)
+    );
+
+    status(
+      "communityMembersStatus",
+      others.length
+        ? `${others.length} community member(s)`
+        : "No other members yet."
+    );
+
+    others.forEach(member => {
+      const card = document.createElement("article");
+      card.className = "member";
+      card.append(avatar(member.full_name, member.avatar_url));
+
+      const details = document.createElement("div");
+      details.className = "member-details";
+
+      const name = document.createElement("strong");
+      name.textContent = member.full_name || "Community member";
+      name.style.cursor = "pointer";
+      name.onclick = () => openMemberProfile(member.user_id);
+
+      const countsText = document.createElement("div");
+      countsText.className = "follow-counts";
+      countsText.textContent =
+        `${counts.followers.get(member.user_id) || 0} followers · ` +
+        `${counts.following.get(member.user_id) || 0} following`;
+
+      details.append(name, countsText);
+
+      const actions = document.createElement("div");
+      actions.className = "member-actions";
+
+      const followButton = document.createElement("button");
+      followButton.className = "small-btn" +
+        (followed.has(member.user_id) ? " following" : "");
+      followButton.textContent = followed.has(member.user_id)
+        ? "Following" : "Follow";
+      followButton.onclick = () => toggleFollow(member.user_id);
+
+      const profileButton = document.createElement("button");
+      profileButton.className = "small-btn";
+      profileButton.textContent = "Profile";
+      profileButton.onclick = () => openMemberProfile(member.user_id);
+
+      actions.append(followButton, profileButton);
+      card.append(details, actions);
+      list.append(card);
+    });
+  } catch (error) {
+    status("communityMembersStatus", "Error: " + error.message);
+  }
+}
+
+async function toggleFollow(targetId) {
+  if (!currentUser || !targetId || targetId === currentUser.id) return;
+
+  try {
+    const { data, error } = await db
+      .from("follows")
+      .select("follower_id")
+      .eq("follower_id", currentUser.id)
+      .eq("following_id", targetId);
+
+    if (error) throw error;
+
+    let result;
+    if (data?.length) {
+      result = await db.from("follows")
+        .delete()
+        .eq("follower_id", currentUser.id)
+        .eq("following_id", targetId);
+    } else {
+      result = await db.from("follows").insert({
+        follower_id: currentUser.id,
+        following_id: targetId
+      });
+    }
+
+    if (result.error) throw result.error;
+
+    await loadCommunityMembers();
+    if (profileTarget === targetId) await openMemberProfile(targetId);
+  } catch (error) {
+    status("communityMembersStatus", "Follow error: " + error.message);
+    status("memberProfileStatus", "Follow error: " + error.message);
+  }
+}
+
+/* Member profile, followers and following */
+
+async function openMemberProfile(userId) {
+  if (!currentUser) return;
+
+  profileTarget = userId;
+  setPageVisibility(null);
+  hide("memberProfilePanel", false);
+  hide("callPanel", true);
+
+  $("memberProfileList").replaceChildren();
+  $("memberProfilePosts").replaceChildren();
+  status("memberProfileStatus", "Loading profile...");
+
+  try {
+    const profiles = await loadPublicProfiles([userId]);
+    const profile = profiles.get(userId);
+
+    if (!profile) throw new Error("Profile not found.");
+
+    $("memberProfileName").textContent =
+      profile.full_name || "Community member";
+    $("memberProfileBio").textContent = "Community member";
+
+    replaceAvatar(
+      "memberProfileAvatar",
+      profile.full_name,
+      profile.avatar_url
+    );
+
+    const counts = await followCounts();
+
+    $("memberProfileCounts").textContent =
+      `${counts.followers.get(userId) || 0} followers · ` +
+      `${counts.following.get(userId) || 0} following`;
+
+    const alreadyFollowing = counts.rows.some(row =>
+      row.follower_id === currentUser.id &&
+      row.following_id === userId
+    );
+
+    $("memberProfileFollow").textContent =
+      userId === currentUser.id
+        ? "Your profile"
+        : alreadyFollowing ? "Unfollow" : "Follow";
+
+    $("memberProfileFollow").disabled = userId === currentUser.id;
+    $("memberAudioCall").disabled = userId === currentUser.id;
+    $("memberVideoCall").disabled = userId === currentUser.id;
+    $("memberProfileMessage").disabled = userId === currentUser.id;
+
+    $("memberProfileFollow").onclick = () => toggleFollow(userId);
+    $("memberProfileFollowers").onclick =
+      () => showFollowList(userId, "followers");
+    $("memberProfileFollowing").onclick =
+      () => showFollowList(userId, "following");
+
+    $("memberProfileMessage").onclick = async () => {
+      await loadChatMembers();
+      $("chatMember").value = userId;
+      selectedChatUser = userId;
+      showPage("messages");
+      $("chatMember").value = userId;
+      await openConversation();
+    };
+
+    $("memberAudioCall").onclick = () => startCall(userId, "audio");
+    $("memberVideoCall").onclick = () => startCall(userId, "video");
+
+    const { data: posts, error } = await db
+      .from("posts")
+      .select("id,user_id,content,created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) throw error;
+
+    const authorProfiles = await loadPublicProfiles(
+      (posts || []).map(post => post.user_id)
+    );
+
+    renderPosts(posts || [], $("memberProfilePosts"), authorProfiles);
+    status("memberProfileStatus", "");
+  } catch (error) {
+    status("memberProfileStatus", "Could not load profile: " + error.message);
+  }
+}
+
+$("closeMemberProfile").onclick = () => showPage("explore");
+
+async function showFollowList(userId, type) {
+  const box = $("memberProfileList");
+  box.replaceChildren();
+  status("memberProfileStatus", "Loading " + type + "...");
+
+  try {
+    const column = type === "followers" ? "following_id" : "follower_id";
+    const idColumn = type === "followers" ? "follower_id" : "following_id";
+
+    const { data, error } = await db
+      .from("follows")
+      .select("follower_id,following_id")
+      .eq(column, userId);
+
+    if (error) throw error;
+
+    const ids = (data || []).map(row => row[idColumn]);
+    const profiles = await loadPublicProfiles(ids);
+
+    if (!ids.length) {
+      box.textContent = "No " + type + " yet.";
+    }
+
+    ids.forEach(id => {
+      const profile = profiles.get(id);
+      if (!profile) return;
+
+      const card = document.createElement("div");
+      card.className = "member";
+      card.append(avatar(profile.full_name, profile.avatar_url));
+
+      const name = document.createElement("strong");
+      name.textContent = profile.full_name || "Member";
+      name.style.cursor = "pointer";
+      name.onclick = () => openMemberProfile(id);
+
+      card.append(name);
+      box.append(card);
+    });
+
+    status("memberProfileStatus", "");
+  } catch (error) {
+    status("memberProfileStatus", "Error: " + error.message);
+  }
+}
+
+/* Posts */
+
+function renderPosts(posts, target, profiles = new Map()) {
+  target.replaceChildren();
+
+  if (!posts.length) {
+    target.textContent = "No posts yet.";
+    return;
+  }
+
+  posts.forEach(post => {
+    const card = document.createElement("article");
+    card.className = "post-card";
+
+    const profile = profiles.get(post.user_id);
+    const author = document.createElement("strong");
+    author.textContent = profile?.full_name || "Community member";
+    author.style.cursor = "pointer";
+    author.onclick = () => openMemberProfile(post.user_id);
+
+    const meta = document.createElement("div");
+    meta.className = "post-meta";
+    meta.textContent = new Date(post.created_at).toLocaleString();
+
+    const content = document.createElement("div");
+    content.className = "post-content";
+    content.textContent = post.content || "";
+
+    card.append(author, meta, content);
+
+    if (currentUser && post.user_id === currentUser.id) {
+      const removeButton = document.createElement("button");
+      removeButton.className = "small-btn";
+      removeButton.style.marginTop = "12px";
+      removeButton.textContent = "Delete my post";
+      removeButton.onclick = () => deletePost(post.id);
+      card.append(removeButton);
+    }
+
+    target.append(card);
+  });
+}
+
+async function deletePost(postId) {
+  if (!currentUser || !confirm("Delete this post?")) return;
+
+  try {
+    const { error } = await db.from("posts")
+      .delete()
+      .eq("id", postId)
+      .eq("user_id", currentUser.id);
+
+    if (error) throw error;
+
+    await Promise.all([loadPosts(), loadHomePosts()]);
+
+    if (profileTarget) await openMemberProfile(profileTarget);
+
+    status("postStatus", "Post deleted.");
+  } catch (error) {
+    status("postStatus", "Could not delete post: " + error.message);
+  }
+}
+
+async function loadPosts() {
+  if (!currentUser) return;
+
+  status("postStatus", "Loading posts...");
+
+  try {
+    const { data, error } = await db
+      .from("posts")
+      .select("id,user_id,content,created_at")
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error) throw error;
+
+    const profiles = await loadPublicProfiles(
+      (data || []).map(post => post.user_id)
+    );
+
+    renderPosts(data || [], $("postsList"), profiles);
+    status("postStatus", `${data?.length || 0} post(s)`);
+  } catch (error) {
+    status("postStatus", "Could not load posts: " + error.message);
+  }
+}
+
+async function loadHomePosts() {
+  if (!currentUser) return;
+
+  try {
+    const { data, error } = await db
+      .from("posts")
+      .select("id,user_id,content,created_at")
+      .order("created_at", { ascending: false })
+      .limit(30);
+
+    if (error) throw error;
+
+    const profiles = await loadPublicProfiles(
+      (data || []).map(post => post.user_id)
+    );
+
+    renderPosts(data || [], $("homePostsList"), profiles);
+  } catch (error) {
+    $("homePostsList").textContent =
+      "Could not load feed: " + error.message;
+  }
+}
+
+$("homeCreateBtn").onclick = () => showPage("create");
+$("homeRefreshBtn").onclick = loadHomePosts;
+$("reloadPostsBtn").onclick = loadPosts;
+$("refreshMembersBtn").onclick = loadCommunityMembers;
+
+$("postForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const content = $("postContent").value.trim();
+  if (!content || !currentUser) return;
+
+  $("postSubmitBtn").disabled = true;
+
+  try {
+    const { error } = await db.from("posts").insert({
+      user_id: currentUser.id,
+      content
+    });
+
+    if (error) throw error;
+
+    $("postContent").value = "";
+    status("postStatus", "Post published!");
+    await Promise.all([loadPosts(), loadHomePosts()]);
+  } catch (error) {
+    status("postStatus", "Could not publish: " + error.message);
+  } finally {
+    $("postSubmitBtn").disabled = false;
+  }
 });
-db.auth.onAuthStateChange((event)=>{if(["SIGNED_IN","SIGNED_OUT","USER_UPDATED"].includes(event))setTimeout(()=>loadDashboard().catch(err=>setStatus("dashboardStatus","Error: "+err.message)),0)});
-loadDashboard().catch(err=>setStatus("status","Connection error: "+err.message));
+
+/* Profile picture upload */
+
+$("uploadAvatarBtn").onclick = async () => {
+  const file = $("avatarFile").files[0];
+
+  if (!file || !currentUser) {
+    status("profileStatus", "Choose a picture first.");
+    return;
+  }
+
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+      file.size > 3 * 1024 * 1024) {
+    status("profileStatus", "Use JPG, PNG or WEBP up to 3 MB.");
+    return;
+  }
+
+  $("uploadAvatarBtn").disabled = true;
+
+  try {
+    status("profileStatus", "Uploading...");
+
+    const extension = file.type === "image/jpeg" ? "jpg" :
+      file.type.split("/")[1];
+
+    const path = currentUser.id + "/" + Date.now() + "." + extension;
+
+    const { error: uploadError } = await db.storage
+      .from("avatars")
+      .upload(path, file, {
+        contentType: file.type,
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: urlData } = db.storage.from("avatars").getPublicUrl(path);
+
+    const { data, error } = await db.from("profiles")
+      .update({ avatar_url: urlData.publicUrl })
+      .eq("id", currentUser.id)
+      .select("id,full_name,email,is_admin,avatar_url")
+      .single();
+
+    if (error) throw error;
+
+    currentProfile = data;
+    replaceAvatar(
+      "profileAvatar",
+      data.full_name || currentUser.user_metadata?.full_name,
+      data.avatar_url
+    );
+
+    status("profileStatus", "Picture updated.");
+    await loadCommunityMembers();
+  } catch (error) {
+    status("profileStatus", "Upload failed: " + error.message);
+  } finally {
+    $("uploadAvatarBtn").disabled = false;
+  }
+};
+
+/* Admin directory */
+
+async function loadMembers() {
+  if (!currentProfile?.is_admin) return;
+
+  try {
+    const { data, error } = await db.from("member_public_profiles")
+      .select("user_id,full_name,avatar_url,created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    $("memberCount").textContent =
+      "Registered profiles: " + (data || []).length;
+
+    $("membersList").replaceChildren();
+
+    (data || []).forEach(member => {
+      const card = document.createElement("div");
+      card.className = "member";
+      card.append(avatar(member.full_name, member.avatar_url));
+
+      const name = document.createElement("strong");
+      name.textContent = member.full_name || "Member";
+      name.style.cursor = "pointer";
+      name.onclick = () => openMemberProfile(member.user_id);
+
+      card.append(name);
+      $("membersList").append(card);
+    });
+  } catch (error) {
+    status("adminStatus", error.message);
+  }
+}
+
+/* Private messages */
+
+async function loadChatMembers() {
+  if (!currentUser) return;
+
+  const select = $("chatMember");
+  const previous = select.value;
+
+  select.replaceChildren();
+
+  const first = document.createElement("option");
+  first.value = "";
+  first.textContent = "Choose a member";
+  select.append(first);
+
+  try {
+    const { data, error } = await db
+      .from("member_public_profiles")
+      .select("user_id,full_name")
+      .order("full_name");
+
+    if (error) throw error;
+
+    (data || []).forEach(member => {
+      if (member.user_id === currentUser.id) return;
+
+      const option = document.createElement("option");
+      option.value = member.user_id;
+      option.textContent = member.full_name || "Member";
+      select.append(option);
+    });
+
+    if (previous) select.value = previous;
+  } catch (error) {
+    status("chatStatus", "Could not load members: " + error.message);
+  }
+}
+
+$("loadChatBtn").onclick = openConversation;
+
+async function openConversation() {
+  if (!currentUser) return;
+
+  selectedChatUser = $("chatMember").value;
+
+  if (!selectedChatUser) {
+    status("chatStatus", "Choose a member.");
+    return;
+  }
+
+  $("chatWith").textContent =
+    "Conversation with " + $("chatMember").selectedOptions[0].textContent;
+
+  await loadMessages();
+  await subscribeToChat();
+}
+
+async function loadMessages() {
+  if (!currentUser || !selectedChatUser) return;
+
+  try {
+    const { data, error } = await db.from("messages")
+      .select("id,sender_id,receiver_id,content,created_at")
+      .or(
+        `and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedChatUser}),` +
+        `and(sender_id.eq.${selectedChatUser},receiver_id.eq.${currentUser.id})`
+      )
+      .order("created_at", { ascending: true })
+      .limit(200);
+
+    if (error) throw error;
+
+    const box = $("chatMessages");
+    box.replaceChildren();
+
+    (data || []).forEach(message => {
+      const element = document.createElement("div");
+      element.className = "chat-message" +
+        (message.sender_id === currentUser.id ? " mine" : "");
+
+      const who = document.createElement("strong");
+      who.textContent = message.sender_id === currentUser.id
+        ? "You"
+        : $("chatMember").selectedOptions[0]?.textContent || "Member";
+
+      const content = document.createElement("div");
+      content.textContent = message.content;
+
+      const time = document.createElement("small");
+      time.textContent = new Date(message.created_at).toLocaleString();
+
+      element.append(who, content, time);
+      box.append(element);
+    });
+
+    box.scrollTop = box.scrollHeight;
+    status("chatStatus", "");
+  } catch (error) {
+    status("chatStatus", "Message error: " + error.message);
+  }
+}
+
+async function subscribeToChat() {
+  if (chatChannel) {
+    await db.removeChannel(chatChannel);
+    chatChannel = null;
+  }
+
+  chatChannel = db.channel(
+    "chat-" + [currentUser.id, selectedChatUser].sort().join("-")
+  ).on("postgres_changes", {
+    event: "INSERT",
+    schema: "public",
+    table: "messages"
+  }, payload => {
+    const message = payload.new;
+
+    if (
+      [message.sender_id, message.receiver_id].includes(currentUser?.id) &&
+      [message.sender_id, message.receiver_id].includes(selectedChatUser)
+    ) {
+      loadMessages();
+    }
+  }).subscribe();
+}
+
+$("chatForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const content = $("chatMessage").value.trim();
+
+  if (!content || !selectedChatUser || !currentUser) {
+    status("chatStatus", "Open a conversation first.");
+    return;
+  }
+
+  $("sendChatBtn").disabled = true;
+
+  try {
+    const { error } = await db.from("messages").insert({
+      sender_id: currentUser.id,
+      receiver_id: selectedChatUser,
+      content
+    });
+
+    if (error) throw error;
+
+    $("chatMessage").value = "";
+    await loadMessages();
+  } catch (error) {
+    status("chatStatus", "Could not send: " + error.message);
+  } finally {
+    $("sendChatBtn").disabled = false;
+  }
+});
+
+/* Audio and video calling */
+
+function showCallPanel() {
+  hide("callPanel", false);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function startCall(targetId, type) {
+  if (!currentUser || !targetId || targetId === currentUser.id) return;
+
+  if (activeCall || incomingCall) {
+    status("memberProfileStatus", "Finish your current call first.");
+    return;
+  }
+
+  if (!navigator.mediaDevices?.getUserMedia || !window.RTCPeerConnection) {
+    status("memberProfileStatus",
+      "Calling is not supported by this browser or connection.");
+    return;
+  }
+
+  try {
+    callType = type;
+    isCaller = true;
+
+    status("memberProfileStatus", "Requesting microphone/camera permission...");
+
+    /* Ask permission before creating a ringing call. */
+    localStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: type === "video"
+    });
+
+    const { data, error } = await db.from("call_signals")
+      .insert({
+        caller_id: currentUser.id,
+        receiver_id: targetId,
+        call_type: type,
+        status: "ringing"
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    activeCall = data;
+    hide("memberProfilePanel", true);
+    showCallPanel();
+    hide("incomingCallActions", true);
+    hide("activeCallActions", false);
+
+    $("callTitle").textContent =
+      type === "video" ? "Outgoing video call" : "Outgoing audio call";
+
+    status("callStatus", "Calling... waiting for answer.");
+
+    await setupPeerConnection();
+    await subscribeToCall();
+
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    const { error: updateError } = await db.from("call_signals")
+      .update({ offer: pc.localDescription.toJSON() })
+      .eq("id", activeCall.id);
+
+    if (updateError) throw updateError;
+  } catch (error) {
+    console.error("Start call error:", error);
+    status("callStatus", "Call failed: " + error.message);
+    await cleanupCall(true);
+  }
+}
+
+async function setupPeerConnection() {
+  pc = new RTCPeerConnection(rtcConfig);
+  remoteDescriptionSet = false;
+  pendingCandidates = [];
+
+  if (!localStream) {
+    localStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: callType === "video"
+    });
+  }
+
+  $("localVideo").srcObject = localStream;
+  $("localVideo").style.display = callType === "video" ? "block" : "none";
+  $("remoteVideo").style.display = callType === "video" ? "block" : "none";
+
+  localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+  pc.ontrack = event => {
+    const stream = event.streams[0];
+    if (!stream) return;
+
+    $("remoteVideo").srcObject = stream;
+    $("remoteAudio").srcObject = stream;
+
+    $("remoteVideo").play().catch(() => {});
+    $("remoteAudio").play().catch(() => {});
+  };
+
+  pc.onicecandidate = async event => {
+    if (!event.candidate || !activeCall || !currentUser) return;
+
+    try {
+      const { error } = await db.from("call_ice_candidates").insert({
+        call_id: activeCall.id,
+        sender_id: currentUser.id,
+        candidate: event.candidate.toJSON()
+      });
+
+      if (error) console.error("ICE candidate error:", error.message);
+    } catch (error) {
+      console.error("ICE insert error:", error);
+    }
+  };
+
+  pc.onconnectionstatechange = () => {
+    if (!pc) return;
+
+    if (pc.connectionState === "connected") {
+      status("callStatus", "Connected.");
+    } else if (pc.connectionState === "failed") {
+      status("callStatus",
+        "Connection failed. Your network may require a TURN server.");
+    } else if (pc.connectionState === "disconnected") {
+      status("callStatus", "Connection interrupted. Trying to reconnect...");
+    }
+  };
+}
+
+async function subscribeToCall() {
+  if (!activeCall) return;
+
+  if (callChannel) await db.removeChannel(callChannel);
+  if (iceChannel) await db.removeChannel(iceChannel);
+
+  const callId = activeCall.id;
+
+  callChannel = db.channel("call-state-" + callId)
+    .on("postgres_changes", {
+      event: "UPDATE",
+      schema: "public",
+      table: "call_signals",
+      filter: "id=eq." + callId
+    }, async payload => {
+      const call = payload.new;
+
+      if (call.status === "rejected" || call.status === "ended") {
+        status("callStatus", "Call " + call.status + ".");
+        await cleanupCall(false);
+        return;
+      }
+
+      if (isCaller && call.answer && pc && !pc.currentRemoteDescription) {
+        try {
+          await pc.setRemoteDescription(call.answer);
+          remoteDescriptionSet = true;
+          await flushCandidates();
+          status("callStatus", "Answer received. Connecting...");
+        } catch (error) {
+          status("callStatus", "Answer error: " + error.message);
+        }
+      }
+    }).subscribe();
+
+  iceChannel = db.channel("call-ice-" + callId)
+    .on("postgres_changes", {
+      event: "INSERT",
+      schema: "public",
+      table: "call_ice_candidates",
+      filter: "call_id=eq." + callId
+    }, async payload => {
+      const row = payload.new;
+      if (row.sender_id !== currentUser.id) {
+        await addRemoteCandidate(row.candidate);
+      }
+    }).subscribe();
+
+  /* Re-read stored candidates to cover events that arrived early. */
+  if (pc?.remoteDescription) {
+    remoteDescriptionSet = true;
+    await flushCandidates();
+  }
+}
+
+async function addRemoteCandidate(candidate) {
+  if (!pc || !candidate) return;
+
+  if (!remoteDescriptionSet) {
+    pendingCandidates.push(candidate);
+    return;
+  }
+
+  try {
+    await pc.addIceCandidate(new RTCIceCandidate(candidate));
+  } catch (error) {
+    console.warn("Could not add ICE candidate:", error.message);
+  }
+}
+
+async function flushCandidates() {
+  if (!pc || !activeCall || !currentUser) return;
+
+  const pending = pendingCandidates.splice(0);
+
+  for (const candidate of pending) {
+    try {
+      await pc.addIceCandidate(new RTCIceCandidate(candidate));
+    } catch (error) {
+      console.warn("ICE candidate error:", error.message);
+    }
+  }
+
+  const { data, error } = await db.from("call_ice_candidates")
+    .select("sender_id,candidate")
+    .eq("call_id", activeCall.id);
+
+  if (error) {
+    console.warn("Could not reload ICE candidates:", error.message);
+    return;
+  }
+
+  for (const row of data || []) {
+    if (row.sender_id !== currentUser.id) {
+      try {
+        await pc.addIceCandidate(new RTCIceCandidate(row.candidate));
+      } catch (error) {
+        /* Candidates already added may be rejected; continue. */
+      }
+    }
+  }
+}
+
+/* Incoming calls */
+
+async function subscribeIncomingCalls() {
+  if (!currentUser) return;
+
+  if (incomingChannel) await db.removeChannel(incomingChannel);
+
+  incomingChannel = db.channel("incoming-calls-" + currentUser.id)
+    .on("postgres_changes", {
+      event: "INSERT",
+      schema: "public",
+      table: "call_signals",
+      filter: "receiver_id=eq." + currentUser.id
+    }, payload => {
+      if (payload.new.status === "ringing") {
+        showIncomingCall(payload.new);
+      }
+    })
+    .on("postgres_changes", {
+      event: "UPDATE",
+      schema: "public",
+      table: "call_signals",
+      filter: "receiver_id=eq." + currentUser.id
+    }, payload => {
+      const call = payload.new;
+
+      if (incomingCall?.id === call.id &&
+          ["ended", "rejected"].includes(call.status)) {
+        incomingCall = null;
+        hide("incomingCallActions", true);
+        hide("callPanel", true);
+      }
+    })
+    .subscribe();
+
+  /* Check for ringing calls that arrived before subscription. */
+  const { data, error } = await db.from("call_signals")
+    .select("*")
+    .eq("receiver_id", currentUser.id)
+    .eq("status", "ringing")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (!error && data?.length && !activeCall && !incomingCall) {
+    showIncomingCall(data[0]);
+  }
+}
+
+async function showIncomingCall(call) {
+  if (!currentUser || activeCall || incomingCall) return;
+  if (seenIncomingCalls.has(call.id)) return;
+
+  seenIncomingCalls.add(call.id);
+  incomingCall = call;
+  callType = call.call_type;
+  isCaller = false;
+
+  hide("memberProfilePanel", true);
+  showCallPanel();
+  hide("incomingCallActions", false);
+  hide("activeCallActions", true);
+
+  $("callTitle").textContent = call.call_type === "video"
+    ? "Incoming video call" : "Incoming audio call";
+
+  status("callStatus", "Incoming call. Accept or reject.");
+
+  try {
+    const profiles = await loadPublicProfiles([call.caller_id]);
+    const caller = profiles.get(call.caller_id);
+    if (incomingCall?.id === call.id && caller?.full_name) {
+      $("callTitle").textContent =
+        `${call.call_type === "video" ? "Video" : "Audio"} call from ${caller.full_name}`;
+    }
+  } catch (error) {
+    console.warn("Could not load caller profile:", error.message);
+  }
+}
+
+$("acceptCallBtn").onclick = async () => {
+  if (!incomingCall || activeCall) return;
+
+  try {
+    activeCall = incomingCall;
+    incomingCall = null;
+    isCaller = false;
+    callType = activeCall.call_type;
+
+    hide("incomingCallActions", true);
+    hide("activeCallActions", false);
+    status("callStatus", "Requesting microphone/camera permission...");
+
+    await setupPeerConnection();
+    await subscribeToCall();
+
+    const { data, error } = await db.from("call_signals")
+      .select("*")
+      .eq("id", activeCall.id)
+      .single();
+
+    if (error) throw error;
+    if (data.status !== "ringing") {
+      throw new Error("This call is no longer ringing.");
+    }
+    if (!data.offer) {
+      throw new Error("Caller offer is not ready. Please try again.");
+    }
+
+    await pc.setRemoteDescription(data.offer);
+    remoteDescriptionSet = true;
+    await flushCandidates();
+
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+
+    const { error: updateError } = await db.from("call_signals")
+      .update({
+        answer: pc.localDescription.toJSON(),
+        status: "accepted"
+      })
+      .eq("id", activeCall.id);
+
+    if (updateError) throw updateError;
+
+    status("callStatus", "Answer sent. Connecting...");
+  } catch (error) {
+    status("callStatus", "Could not accept call: " + error.message);
+    await cleanupCall(true);
+  }
+};
+
+$("rejectCallBtn").onclick = async () => {
+  if (!incomingCall) return;
+
+  const call = incomingCall;
+  incomingCall = null;
+
+  try {
+    await db.from("call_signals")
+      .update({ status: "rejected" })
+      .eq("id", call.id);
+  } finally {
+    hide("incomingCallActions", true);
+    hide("callPanel", true);
+  }
+};
+
+async function cleanupCall(updateStatus = true) {
+  const oldCall = activeCall;
+  const oldIncoming = incomingCall;
+
+  /* Clear local state first to prevent duplicate cleanup events. */
+  activeCall = null;
+  incomingCall = null;
+
+  if (updateStatus && oldCall && currentUser) {
+    try {
+      await db.from("call_signals")
+        .update({ status: "ended" })
+        .eq("id", oldCall.id);
+    } catch (error) {
+      console.warn("Could not update call status:", error.message);
+    }
+  }
+
+  if (updateStatus && oldIncoming && currentUser) {
+    try {
+      await db.from("call_signals")
+        .update({ status: "rejected" })
+        .eq("id", oldIncoming.id);
+    } catch (error) {
+      console.warn("Could not reject call:", error.message);
+    }
+  }
+
+  if (callChannel) await db.removeChannel(callChannel);
+  if (iceChannel) await db.removeChannel(iceChannel);
+
+  callChannel = null;
+  iceChannel = null;
+
+  if (pc) pc.close();
+  pc = null;
+
+  if (localStream) {
+    localStream.getTracks().forEach(track => track.stop());
+  }
+
+  localStream = null;
+  $("localVideo").srcObject = null;
+  $("remoteVideo").srcObject = null;
+  $("remoteAudio").srcObject = null;
+
+  pendingCandidates = [];
+  remoteDescriptionSet = false;
+  micMuted = false;
+  cameraOff = false;
+
+  $("muteCallBtn").textContent = "Mute mic";
+  $("cameraCallBtn").textContent = "Camera off";
+
+  hide("incomingCallActions", true);
+  hide("activeCallActions", true);
+  hide("callPanel", true);
+}
+
+$("endCallBtn").onclick = () => cleanupCall(true);
+
+$("hideCallBtn").onclick = () => {
+  /* Hiding the panel does not end the call. */
+  hide("callPanel", true);
+};
+
+$("muteCallBtn").onclick = () => {
+  if (!localStream) return;
+
+  micMuted = !micMuted;
+  localStream.getAudioTracks().forEach(track => {
+    track.enabled = !micMuted;
+  });
+
+  $("muteCallBtn").textContent = micMuted ? "Unmute mic" : "Mute mic";
+};
+
+$("cameraCallBtn").onclick = () => {
+  if (!localStream || callType !== "video") return;
+
+  cameraOff = !cameraOff;
+  localStream.getVideoTracks().forEach(track => {
+    track.enabled = !cameraOff;
+  });
+
+  $("cameraCallBtn").textContent = cameraOff ? "Camera on" : "Camera off";
+};
+
+/* Refresh, logout and startup */
+
+$("refreshBtn").onclick = async () => {
+  try {
+    await loadDashboard();
+    status("dashboardStatus", "Refreshed.");
+  } catch (error) {
+    status("dashboardStatus", error.message);
+  }
+};
+
+$("logoutBtn").onclick = async () => {
+  await cleanupCall(true);
+
+  if (chatChannel) await db.removeChannel(chatChannel);
+  if (incomingChannel) await db.removeChannel(incomingChannel);
+
+  chatChannel = null;
+  incomingChannel = null;
+
+  const { error } = await db.auth.signOut();
+
+  if (error) {
+    status("status", "Could not log out: " + error.message);
+    return;
+  }
+
+  currentUser = null;
+  currentProfile = null;
+  selectedChatUser = null;
+  profileTarget = null;
+
+  document.body.classList.remove("app-mode");
+  hide("authCard", false);
+
+  [
+    "homePanel", "dashboard", "communityMembersPanel",
+    "chatPanel", "postsPanel", "adminPanel",
+    "memberProfilePanel", "callPanel"
+  ].forEach(id => hide(id, true));
+
+  status("status", "Logged out successfully.");
+};
+
+db.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_OUT") {
+    currentUser = null;
+    currentProfile = null;
+    document.body.classList.remove("app-mode");
+    hide("authCard", false);
+  }
+});
+
+/* Start the app and restore an existing session. */
+loadDashboard().catch(error => {
+  console.error("Startup error:", error);
+  status("status", "Connection error: " + error.message);
+});
 </script>
 </body>
 </html>
