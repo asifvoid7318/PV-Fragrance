@@ -133,12 +133,91 @@ video {max-width:100%;background:#202236;border-radius:12px}
   .auth-layout,.chat-layout,.member-list {grid-template-columns:1fr}
   .panel {padding:16px}
 }
+
+/* Community Hub visual refresh */
+:root {
+  --bg:#f4f5fb;
+  --panel:#ffffff;
+  --text:#1e2035;
+  --muted:#70748b;
+  --purple:#6554e8;
+  --green:#159b78;
+  --border:#e5e7f2;
+  --soft:#f7f7ff;
+  --shadow:0 12px 34px rgba(35,31,90,.07);
+}
+body {background:radial-gradient(ellipse at top left,#eeebff 0,transparent 35%),var(--bg);transition:background .2s,color .2s}
+.navbar {position:sticky;top:0;z-index:30;background:rgba(255,255,255,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 0}
+.navbar .container {display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand {display:flex;align-items:center;gap:10px;letter-spacing:-.5px}
+.brand-mark {width:38px;height:38px;border-radius:13px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#8d63f7,#5145d9);box-shadow:0 7px 18px #6554e83b}
+.theme-toggle {border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:12px;padding:9px 12px;font-weight:700}
+.workspace {padding-top:24px;max-width:980px}
+.panel {border-radius:22px;padding:24px;box-shadow:var(--shadow);margin-bottom:18px}
+h1,h2,h3 {letter-spacing:-.35px}
+h2 {font-size:clamp(1.25rem,2.5vw,1.7rem)}
+.btn {background:linear-gradient(135deg,#7963f1,#5b4be0);box-shadow:0 5px 13px #6554e81f;transition:transform .15s,filter .15s}
+.btn:hover {filter:brightness(1.04);transform:translateY(-1px)}
+.btn:focus-visible,.small-btn:focus-visible,.post-action:focus-visible,.nav-tab:focus-visible,.theme-toggle:focus-visible {outline:3px solid #a69aff;outline-offset:2px}
+.secondary {background:#efedff;color:#5b4be0;box-shadow:none}
+.danger {background:#fff0f2;color:#c63852;box-shadow:none}
+.field {background:var(--soft);border-color:var(--border);padding:13px 14px;transition:border-color .15s,box-shadow .15s}
+.field:focus {outline:none;border-color:#8b7df3;box-shadow:0 0 0 3px #6554e81c}
+.form-card {border:1px solid var(--border);background:linear-gradient(145deg,#faf9ff,#f4f7ff);border-radius:18px}
+.post-form {border:1px solid var(--border);background:var(--soft);border-radius:17px}
+.post-card {border:1px solid var(--border);border-radius:17px;padding:17px;background:var(--panel);box-shadow:0 4px 16px #24244b07;transition:box-shadow .15s,transform .15s}
+.post-card:hover {box-shadow:0 10px 24px #24244b0d}
+.post-media {max-height:620px;object-fit:contain;background:#f0f1f7;border-radius:15px}
+.post-action {transition:background .15s,border-color .15s}
+.post-action:hover,.small-btn:hover {background:var(--soft);border-color:#c8c4fa}
+.member {border-radius:16px;background:var(--panel);transition:transform .15s,box-shadow .15s}
+.member:hover {transform:translateY(-2px);box-shadow:0 8px 18px #24244b0a}
+.avatar {background:linear-gradient(135deg,#eeeaff,#e3f4ff);color:#5b4be0}
+.chat-scroll {background:var(--soft)}
+.chat-message {background:#eeeff7}
+.chat-message.mine {background:#e9e4ff}
+.bottom-nav {backdrop-filter:blur(18px);box-shadow:0 -8px 25px #29215c08}
+.nav-tab {font-weight:650;transition:background .15s,color .15s}
+.nav-tab.active {color:var(--purple);background:#efedff}
+.status {overflow-wrap:anywhere}
+@media(min-width:900px) {
+  body.app-mode .workspace {padding-top:24px}
+}
+@media(max-width:600px) {
+  .workspace {padding-top:12px}
+  .panel {padding:16px;border-radius:18px}
+  .navbar {padding:10px 0}
+  .brand {font-size:19px}
+  .brand-mark {width:34px;height:34px;border-radius:11px}
+  .theme-toggle {padding:8px 10px}
+  .post-card {padding:13px}
+  .post-actions {gap:7px}
+  .post-action {padding:8px 10px}
+}
+body.dark-theme {
+  --bg:#10111b;--panel:#191b29;--text:#f0f1fa;--muted:#a5a8bd;--border:#2c3044;--soft:#202234;--shadow:0 12px 34px rgba(0,0,0,.18);
+  background:radial-gradient(ellipse at top left,#29204d 0,transparent 38%),var(--bg);
+}
+body.dark-theme .navbar {background:rgba(24,25,39,.9)}
+body.dark-theme .form-card {background:linear-gradient(145deg,#202033,#1b2534)}
+body.dark-theme .secondary {background:#302b50;color:#d1caff}
+body.dark-theme .danger {background:#3a202b;color:#ffb6c4}
+body.dark-theme .field {background:#202234;color:var(--text)}
+body.dark-theme .post-media {background:#11121c}
+body.dark-theme .post-action,body.dark-theme .small-btn,body.dark-theme .theme-toggle {background:#202234;color:var(--text);border-color:var(--border)}
+body.dark-theme .post-action:hover,body.dark-theme .small-btn:hover {background:#2a2c42}
+body.dark-theme .chat-message {background:#2a2c40}
+body.dark-theme .chat-message.mine {background:#383052}
+body.dark-theme .nav-tab.active {background:#302b50;color:#d1caff}
+body.dark-theme .bottom-nav {background:rgba(25,27,41,.94)}
+body.dark-theme .avatar {background:linear-gradient(135deg,#302b50,#1d3442);color:#d1caff}
+
 </style>
 </head>
 
 <body>
 <nav class="navbar">
-  <div class="container brand">✦ Community Hub</div>
+  <div class="container"><div class="brand"><span class="brand-mark" aria-hidden="true">✦</span><span>Community Hub</span></div><button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme">☾ Dark mode</button></div>
 </nav>
 
 <main class="container workspace">
@@ -1868,6 +1947,27 @@ loadDashboard().catch(error => {
   console.error("Startup error:", error);
   status("status", "Connection error: " + error.message);
 });
+
+/* Theme preference: light/dark mode */
+(function setupThemeToggle() {
+  const toggle = document.getElementById("themeToggle");
+  if (!toggle) return;
+  let savedTheme = "light";
+  try { savedTheme = localStorage.getItem("community-hub-theme") || "light"; } catch (_) {}
+  document.body.classList.toggle("dark-theme", savedTheme === "dark");
+  function updateLabel() {
+    const dark = document.body.classList.contains("dark-theme");
+    toggle.textContent = dark ? "☀ Light mode" : "☾ Dark mode";
+    toggle.setAttribute("aria-pressed", String(dark));
+  }
+  updateLabel();
+  toggle.addEventListener("click", () => {
+    const dark = document.body.classList.toggle("dark-theme");
+    try { localStorage.setItem("community-hub-theme", dark ? "dark" : "light"); } catch (_) {}
+    updateLabel();
+  });
+})();
+
 </script>
 </body>
 </html>
