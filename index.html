@@ -225,6 +225,23 @@ body.app-mode #bellBtn{display:grid}
 .save-btn{margin-left:auto}
 #ownPostsGrid{margin-top:10px}
 
+/* ---------- Extras: accents, tags, chips ---------- */
+body[data-accent=pink]{--brand:#d6336c;--brand-soft:#ffe3ee}
+body[data-accent=green]{--brand:#159b78;--brand-soft:#dcf5ec}
+body[data-accent=blue]{--brand:#2f7de1;--brand-soft:#e1edff}
+body.dark-theme[data-accent=pink]{--brand:#ff7aa8;--brand-soft:#45202f}
+body.dark-theme[data-accent=green]{--brand:#4fd1a8;--brand-soft:#17332b}
+body.dark-theme[data-accent=blue]{--brand:#7db4ff;--brand-soft:#1c2c47}
+.swatches{display:flex;gap:10px;align-items:center;margin-top:14px}
+.swatches::before{content:"Accent colour";font-weight:650;margin-right:4px}
+.swatch{width:30px;height:30px;border-radius:50%;border:3px solid var(--panel);box-shadow:0 0 0 1px var(--border)}
+.swatch[aria-pressed=true]{box-shadow:0 0 0 3px var(--text)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chip{border:1px solid var(--border);background:var(--panel);border-radius:999px;padding:6px 12px;font-weight:650;font-size:14px;color:var(--text)}
+.chip.on{background:var(--brand);border-color:transparent;color:#fff}
+.chip.tag{color:var(--brand)}
+.tag-link{border:0;background:none;padding:0;color:var(--brand);font:inherit;font-weight:650}
+
 /* ---------- Post viewer and toast ---------- */
 .modal{position:fixed;inset:0;z-index:2000;background:rgba(10,10,20,.62);overflow:auto;padding:16px 12px 40px}
 .modal-body{width:min(100%,560px);margin:0 auto}
@@ -330,6 +347,7 @@ body.app-mode #bellBtn{display:grid}
     <input class="field" id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp">
     <button class="btn secondary full-width" id="uploadAvatarBtn">Upload picture</button>
   </details>
+  <div class="swatches" id="accentPicker" role="group" aria-label="Accent colour"></div>
   <p id="profileStatus" class="status muted"></p>
   <p id="dashboardStatus" class="status muted"></p>
 
@@ -345,7 +363,9 @@ body.app-mode #bellBtn{display:grid}
   <h3 id="exploreMembersTitle" style="margin-top:14px">Suggested for you</h3>
   <div class="member-list" id="communityMembersList"></div>
   <div id="exploreGridWrap">
-    <h3 style="margin-bottom:10px">Explore</h3>
+    <h3 style="margin-bottom:10px">Trending</h3>
+    <div class="chips" id="trendingTags"></div>
+    <h3 id="exploreGridTitle" style="margin-bottom:10px">Explore</h3>
     <div class="post-grid" id="exploreGrid"></div>
   </div>
 </section>
@@ -354,7 +374,7 @@ body.app-mode #bellBtn{display:grid}
 <section class="panel hidden" id="postsPanel">
   <h2>New post</h2>
   <form id="postForm" class="post-form">
-    <textarea class="field" id="postContent" maxlength="2000" placeholder="Write a caption… (optional if adding media)"></textarea>
+    <textarea class="field" id="postContent" maxlength="2000" placeholder="Write a caption… use #hashtags (optional if adding media)"></textarea>
     <label class="field-label" for="postMediaFile">Add photo or video</label>
     <input class="field" id="postMediaFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">
     <p class="muted" style="font-size:13px;margin:8px 0 0">Images up to 8 MB; videos up to 25 MB.</p>
@@ -535,6 +555,7 @@ const rtcConfig = {
 
 const SVG_OPEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
 const ICON = {
+  share: SVG_OPEN + '<path d="M22 3 11 14"/><path d="M22 3l-7 19-4-8-8-4z"/></svg>',
   bookmark: SVG_OPEN + '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
   bookmarkFill: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
   heart: SVG_OPEN + '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
@@ -806,6 +827,7 @@ async function loadDashboard() {
     loadStories();
     refreshBell();
     subscribeNotifications();
+    openFromHash();
     await subscribeIncomingCalls();
   } catch (error) {
     console.error("Dashboard error:", error);
@@ -987,7 +1009,7 @@ function buildPostCard(post, profiles, m) {
   } else if (post.content) {
     const text = document.createElement("div");
     text.className = "post-text";
-    text.textContent = post.content;
+    addRichText(text, post.content);
     card.append(text);
   }
 
@@ -1031,7 +1053,26 @@ function buildPostCard(post, profiles, m) {
     }
   };
   renderSave();
-  actions.append(likeButton, commentButton, saveButton);
+  const shareButton = document.createElement("button");
+  shareButton.className = "icon-btn";
+  shareButton.type = "button";
+  shareButton.innerHTML = ICON.share;
+  shareButton.setAttribute("aria-label", "Share");
+  shareButton.title = "Share";
+  shareButton.onclick = async () => {
+    const url = location.origin + location.pathname + "#post=" + post.id;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Community Hub", text: (post.content || "").slice(0, 80) || authorName + "'s post", url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast("Link copied.");
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") toast("Could not share this post.");
+    }
+  };
+  actions.append(likeButton, commentButton, shareButton, saveButton);
   card.append(actions);
 
   const likesEl = document.createElement("div");
@@ -1046,7 +1087,8 @@ function buildPostCard(post, profiles, m) {
     captionName.className = "name-link";
     captionName.textContent = authorName;
     captionName.onclick = () => openMemberProfile(post.user_id);
-    caption.append(captionName, document.createTextNode(post.content));
+    caption.append(captionName);
+    addRichText(caption, post.content);
     card.append(caption);
   }
 
@@ -1385,6 +1427,7 @@ function renderExploreMembers() {
 async function loadExplore() {
   if (!currentUser) return;
   status("communityMembersStatus", "Loading…");
+  $("exploreGridTitle").textContent = "Explore";
 
   try {
     const [membersResult, postsResult] = await Promise.all([
@@ -1404,6 +1447,7 @@ async function loadExplore() {
       .filter(member => member.user_id !== currentUser.id);
 
     renderExploreMembers();
+    renderTrending(postsResult.data || []);
     renderGrid(
       (postsResult.data || []).filter(post => post.media_url),
       $("exploreGrid"),
@@ -1612,6 +1656,7 @@ async function showFollowList(userId, type, box, statusId) {
 let previewUrl = null;
 
 function clearPreview() {
+  postFilter = "none";
   if (previewUrl) URL.revokeObjectURL(previewUrl);
   previewUrl = null;
   $("mediaPreview").replaceChildren();
@@ -1630,12 +1675,13 @@ $("postMediaFile").addEventListener("change", () => {
   if (isVideo) { el.controls = true; el.muted = true; el.playsInline = true; }
   else el.alt = "Selected photo preview";
   $("mediaPreview").append(el);
+  if (!isVideo && file.type !== "image/gif") addFilterBar(el);
 });
 
 $("postForm").addEventListener("submit", async event => {
   event.preventDefault();
   const content = $("postContent").value.trim();
-  const file = $("postMediaFile").files[0];
+  let file = $("postMediaFile").files[0];
   if (!currentUser) return;
 
   if (!content && !file) {
@@ -1654,6 +1700,9 @@ $("postForm").addEventListener("submit", async event => {
   $("postSubmitBtn").disabled = true;
 
   try {
+    if (file && postFilter !== "none" && file.type.startsWith("image/") && file.type !== "image/gif") {
+      file = await bakeFilter(file, postFilter);
+    }
     let mediaUrl = null;
     let mediaType = "text";
 
@@ -2688,6 +2737,158 @@ $("storyDelete").onclick = async () => {
   toast("Story deleted.");
   loadStories();
 };
+
+/* ---------- Hashtags and trending ---------- */
+
+const TAG_RE = /#[\p{L}\p{N}_]{2,30}/gu;
+
+function addRichText(el, text) {
+  text.split(/(#[\p{L}\p{N}_]{2,30})/u).forEach((part, i) => {
+    if (i % 2 === 0) { if (part) el.append(document.createTextNode(part)); return; }
+    const tag = document.createElement("button");
+    tag.type = "button";
+    tag.className = "tag-link";
+    tag.textContent = part;
+    tag.onclick = () => openTag(part);
+    el.append(tag);
+  });
+}
+
+async function openTag(tag) {
+  closePostModal();
+  setPageVisibility("explore");
+  hide("callPanel", true);
+  $("exploreSearch").value = "";
+  renderExploreMembers();
+  hide("exploreGridWrap", false);
+  $("exploreGridTitle").textContent = tag;
+  window.scrollTo({ top: 0 });
+  try {
+    const like = "%" + tag.replace(/_/g, "\\_") + "%";
+    const { data, error } = await db.from("posts").select(POST_COLS)
+      .ilike("content", like).order("created_at", { ascending: false }).limit(60);
+    if (error) throw error;
+    renderGrid(data || [], $("exploreGrid"), "No posts with " + tag + " yet.");
+  } catch (error) {
+    toast("Could not search " + tag + ": " + error.message);
+  }
+}
+
+function renderTrending(posts) {
+  const counts = new Map();
+  posts.forEach(p => (p.content || "").match(TAG_RE)?.forEach(t => {
+    t = t.toLowerCase();
+    counts.set(t, (counts.get(t) || 0) + 1);
+  }));
+  const box = $("trendingTags");
+  box.replaceChildren();
+  [...counts].sort((a, b) => b[1] - a[1]).slice(0, 8).forEach(([tag]) => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip tag";
+    chip.textContent = tag;
+    chip.onclick = () => openTag(tag);
+    box.append(chip);
+  });
+  if (!box.children.length) {
+    const hint = document.createElement("span");
+    hint.className = "muted";
+    hint.style.fontSize = "14px";
+    hint.textContent = "Add #hashtags to your posts and they show up here.";
+    box.append(hint);
+  }
+}
+
+/* ---------- Photo filters (applied to the real image when you post) ---------- */
+
+const FILTERS = {
+  Normal: "none",
+  Warm: "sepia(.35) saturate(1.3) hue-rotate(-10deg)",
+  Cool: "saturate(1.1) hue-rotate(15deg) brightness(1.05)",
+  "B&W": "grayscale(1) contrast(1.1)",
+  Fade: "contrast(.9) brightness(1.1) saturate(.8)",
+  Pop: "contrast(1.2) saturate(1.5)"
+};
+let postFilter = "none";
+const canFilter = (() => {
+  try { return "filter" in document.createElement("canvas").getContext("2d"); } catch (_) { return false; }
+})();
+
+function addFilterBar(img) {
+  if (!canFilter) return;
+  const bar = document.createElement("div");
+  bar.className = "chips";
+  Object.keys(FILTERS).forEach(name => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip" + (name === "Normal" ? " on" : "");
+    chip.textContent = name;
+    chip.onclick = () => {
+      postFilter = name === "Normal" ? "none" : name;
+      img.style.filter = FILTERS[name];
+      bar.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === chip));
+    };
+    bar.append(chip);
+  });
+  $("mediaPreview").append(bar);
+}
+
+async function bakeFilter(file, name) {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 2048 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    const ctx = canvas.getContext("2d");
+    ctx.filter = FILTERS[name];
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.9));
+    if (!blob) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
+  } catch (error) {
+    console.warn("Filter not applied:", error.message);
+    return file;
+  }
+}
+
+/* ---------- Share links (#post=ID) ---------- */
+
+async function openFromHash() {
+  const match = location.hash.match(/^#post=(\d+)$/);
+  if (!match || !currentUser) return;
+  const { data } = await db.from("posts").select(POST_COLS).eq("id", match[1]).maybeSingle();
+  history.replaceState(null, "", location.pathname + location.search);
+  if (data) openPostModal(data); else toast("That post is not available.");
+}
+window.addEventListener("hashchange", openFromHash);
+
+/* ---------- Accent colour ---------- */
+
+const ACCENTS = { purple: "#7655e8", pink: "#d6336c", green: "#159b78", blue: "#2f7de1" };
+
+function setAccent(name) {
+  if (name === "purple") delete document.body.dataset.accent;
+  else document.body.dataset.accent = name;
+  try { localStorage.setItem("community-hub-accent", name); } catch (_) {}
+  document.querySelectorAll(".swatch").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.accent === name)));
+}
+
+(function setupAccent() {
+  Object.entries(ACCENTS).forEach(([name, color]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "swatch";
+    button.dataset.accent = name;
+    button.style.background = color;
+    button.setAttribute("aria-label", name + " accent");
+    button.onclick = () => setAccent(name);
+    $("accentPicker").append(button);
+  });
+  let saved = "purple";
+  try { saved = localStorage.getItem("community-hub-accent") || "purple"; } catch (_) {}
+  setAccent(ACCENTS[saved] ? saved : "purple");
+})();
 
 /* ---------- Refresh, logout and startup ---------- */
 
