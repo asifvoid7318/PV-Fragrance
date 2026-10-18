@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#f7f6fb">
+<meta name="description" content="Community Hub: posts, followers, private chat and calls.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hub">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Community Hub</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -43,6 +51,16 @@ button:disabled{opacity:.55;cursor:not-allowed}
 h1,h2,h3{letter-spacing:-.02em;margin:0}
 h2{font-size:clamp(20px,4.5vw,24px);line-height:1.2}
 h3{font-size:17px}
+
+/* ---------- App feel (installed mode) ---------- */
+html{-webkit-tap-highlight-color:transparent}
+body{overscroll-behavior-y:none}
+.navbar{padding-top:env(safe-area-inset-top)}
+.nav-actions{display:flex;align-items:center;gap:8px}
+.install-btn{border:0;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:700;background:var(--brand);color:#fff}
+body.dark-theme .install-btn{color:#16102e}
+.ios-hint{position:fixed;left:12px;right:12px;bottom:calc(70px + env(safe-area-inset-bottom));z-index:60;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px 40px 14px 16px;font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.18)}
+.ios-hint button{position:absolute;top:6px;right:6px;border:0;background:none;font-size:20px;width:32px;height:32px}
 
 /* ---------- Top bar ---------- */
 .navbar{position:sticky;top:0;z-index:40;background:var(--nav-bg);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
@@ -178,6 +196,35 @@ body.app-mode .bottom-nav{display:block;position:fixed;left:0;right:0;bottom:0;z
 .nav-tab.active{color:var(--brand)}
 .nav-tab.active svg{stroke-width:2.5}
 
+/* ---------- Stories, notifications, saved ---------- */
+.stories{display:flex;gap:14px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:none}
+.story-item{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:66px;font-size:12px;position:relative}
+.story-ring{padding:3px;border-radius:50%;background:linear-gradient(135deg,#8d63f7,#e8365d,#f5a623)}
+.story-ring.seen{background:var(--border)}
+.story-ring.none{background:transparent;border:2px dashed var(--border);padding:1px}
+.story-ring .avatar{width:58px;height:58px;border:2px solid var(--panel)}
+.story-plus{position:absolute;right:6px;top:42px;width:20px;height:20px;border-radius:50%;background:var(--brand);color:#fff;border:2px solid var(--panel);display:grid;place-items:center;font-size:14px;line-height:1}
+.story-item .lbl{max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.story-viewer{position:fixed;inset:0;z-index:2500;background:#000;display:flex;flex-direction:column;color:#fff}
+.story-bars{display:flex;gap:4px;padding:calc(10px + env(safe-area-inset-top)) 12px 0}
+.story-bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.35)}
+.story-bars i.done{background:#fff}
+.story-bars i.now{background:linear-gradient(#fff,#fff) no-repeat left/0 100% rgba(255,255,255,.35);animation:storyfill var(--dur,5s) linear forwards}
+@keyframes storyfill{to{background-size:100% 100%}}
+.story-top{display:flex;align-items:center;gap:10px;padding:10px 14px}
+.story-top #storyWho{flex:1;font-weight:700}
+.story-top button{border:0;background:none;color:#fff;font-size:15px;font-weight:700}
+.story-top #storyClose{font-size:28px;line-height:1}
+.story-stage{flex:1;min-height:0;display:grid;place-items:center}
+.story-stage img,.story-stage video{max-width:100%;max-height:100%;object-fit:contain;background:#000}
+.notif{width:100%;text-align:left}
+.notif.unread{background:var(--brand-soft);border-color:transparent}
+#bellBtn{display:none;position:relative}
+body.app-mode #bellBtn{display:grid}
+.dot{position:absolute;top:8px;right:8px;width:10px;height:10px;border-radius:50%;background:var(--like);border:2px solid var(--panel)}
+.save-btn{margin-left:auto}
+#ownPostsGrid{margin-top:10px}
+
 /* ---------- Post viewer and toast ---------- */
 .modal{position:fixed;inset:0;z-index:2000;background:rgba(10,10,20,.62);overflow:auto;padding:16px 12px 40px}
 .modal-body{width:min(100%,560px);margin:0 auto}
@@ -200,7 +247,11 @@ body.app-mode .bottom-nav{display:block;position:fixed;left:0;right:0;bottom:0;z
 <nav class="navbar">
   <div class="container nav-inner">
     <div class="brand"><span class="brand-mark" aria-hidden="true">✦</span><span>Community Hub</span></div>
-    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme">☾ Dark mode</button>
+    <div class="nav-actions">
+      <button class="icon-btn" id="bellBtn" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot hidden" id="bellDot"></span></button>
+      <button class="install-btn hidden" id="installBtn" type="button">Install app</button>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme">☾ Dark mode</button>
+    </div>
   </div>
 </nav>
 
@@ -239,6 +290,8 @@ body.app-mode .bottom-nav{display:block;position:fixed;left:0;right:0;bottom:0;z
 <!-- Home feed -->
 <section class="hidden" id="homePanel">
   <p class="muted" id="homeWelcome"></p>
+  <div class="stories" id="storiesBar"></div>
+  <input type="file" id="storyFile" class="hidden" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm">
   <div class="feed-top">
     <div class="tabs" role="tablist" aria-label="Feed">
       <button class="tab active" id="feedTabFollowing" role="tab" aria-selected="true">Following</button>
@@ -281,7 +334,7 @@ body.app-mode .bottom-nav{display:block;position:fixed;left:0;right:0;bottom:0;z
   <p id="dashboardStatus" class="status muted"></p>
 
   <div id="ownProfileList" class="member-list"></div>
-  <div class="grid-title">Your posts</div>
+  <div class="tabs" style="margin-top:20px"><button class="tab active" id="tabMine" type="button">Posts</button><button class="tab" id="tabSaved" type="button">Saved</button></div>
   <div id="ownPostsGrid" class="post-grid"></div>
 </section>
 
@@ -326,6 +379,12 @@ body.app-mode .bottom-nav{display:block;position:fixed;left:0;right:0;bottom:0;z
     <button class="btn full-width" id="sendChatBtn" type="submit">Send</button>
   </form>
   <p id="chatStatus" class="status muted"></p>
+</section>
+
+<!-- Notifications -->
+<section class="panel hidden" id="notifPanel">
+  <h2>Notifications</h2>
+  <div id="notifList" class="member-list"></div>
 </section>
 
 <!-- Admin -->
@@ -398,6 +457,17 @@ body.app-mode .bottom-nav{display:block;position:fixed;left:0;right:0;bottom:0;z
   </div>
 </div>
 
+<div class="story-viewer hidden" id="storyViewer" role="dialog" aria-modal="true" aria-label="Story">
+  <div class="story-bars" id="storyBars"></div>
+  <div class="story-top"><span id="storyWho"></span><button id="storyDelete" class="hidden" type="button">Delete</button><button id="storyClose" type="button" aria-label="Close story">×</button></div>
+  <div class="story-stage" id="storyStage"></div>
+</div>
+
+<div class="ios-hint hidden" id="iosHint" role="note">
+  To install on iPhone: tap <b>Share</b> in Safari, then <b>Add to Home Screen</b>.
+  <button id="iosHintClose" aria-label="Close">×</button>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <nav class="bottom-nav" id="bottomNav" aria-label="Main navigation">
@@ -465,6 +535,8 @@ const rtcConfig = {
 
 const SVG_OPEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
 const ICON = {
+  bookmark: SVG_OPEN + '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
+  bookmarkFill: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
   heart: SVG_OPEN + '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
   heartFill: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
   comment: SVG_OPEN + '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 21l1.9-5.1A8.4 8.4 0 1 1 21 11.5z"/></svg>',
@@ -548,7 +620,8 @@ function setPageVisibility(page) {
     explore: "communityMembersPanel",
     create: "postsPanel",
     messages: "chatPanel",
-    profile: "dashboard"
+    profile: "dashboard",
+    notifications: "notifPanel"
   };
 
   Object.values(pages).forEach(id => hide(id, true));
@@ -573,7 +646,8 @@ function showPage(page) {
   setPageVisibility(page);
 
   if (page === "messages") loadChatMembers();
-  if (page === "home") loadHomeFeed();
+  if (page === "home") { loadHomeFeed(); loadStories(); }
+  if (page === "notifications") loadNotifications();
   if (page === "explore") loadExplore();
   if (page === "profile") loadOwnProfile();
 
@@ -681,7 +755,7 @@ async function loadDashboard() {
       [
         "homePanel", "dashboard", "communityMembersPanel",
         "chatPanel", "postsPanel", "adminPanel",
-        "memberProfilePanel", "callPanel"
+        "memberProfilePanel", "callPanel", "notifPanel"
       ].forEach(id => hide(id, true));
 
       return;
@@ -722,12 +796,16 @@ async function loadDashboard() {
 
     await Promise.all([
       loadMyFollowing(),
+      loadMySaved(),
       loadChatMembers(),
       profile.is_admin ? loadMembers() : Promise.resolve()
     ]);
 
     setPageVisibility("home");
     loadHomeFeed();
+    loadStories();
+    refreshBell();
+    subscribeNotifications();
     await subscribeIncomingCalls();
   } catch (error) {
     console.error("Dashboard error:", error);
@@ -928,7 +1006,32 @@ function buildPostCard(post, profiles, m) {
   commentButton.setAttribute("aria-label", "Comment");
   commentButton.title = "Comment";
 
-  actions.append(likeButton, commentButton);
+  const saveButton = document.createElement("button");
+  saveButton.className = "icon-btn save-btn";
+  saveButton.type = "button";
+  function renderSave() {
+    const saved = mySaved.has(post.id);
+    saveButton.innerHTML = saved ? ICON.bookmarkFill : ICON.bookmark;
+    saveButton.setAttribute("aria-label", saved ? "Remove from saved" : "Save");
+    saveButton.setAttribute("aria-pressed", String(saved));
+  }
+  saveButton.onclick = async () => {
+    const had = mySaved.has(post.id);
+    if (had) mySaved.delete(post.id); else mySaved.add(post.id);
+    renderSave();
+    try {
+      const r = had
+        ? await db.from("saved_posts").delete().eq("user_id", currentUser.id).eq("post_id", post.id)
+        : await db.from("saved_posts").insert({ user_id: currentUser.id, post_id: post.id });
+      if (r.error) throw r.error;
+    } catch (error) {
+      if (had) mySaved.add(post.id); else mySaved.delete(post.id);
+      renderSave();
+      toast("Could not update saved: " + error.message);
+    }
+  };
+  renderSave();
+  actions.append(likeButton, commentButton, saveButton);
   card.append(actions);
 
   const likesEl = document.createElement("div");
@@ -1362,7 +1465,8 @@ async function loadOwnProfile() {
     $("ownFollowerCount").textContent = counts.followers;
     $("ownFollowingCount").textContent = counts.following;
 
-    renderGrid(
+    if (ownTab === "saved") loadSavedGrid();
+    else renderGrid(
       postsResult.data || [],
       $("ownPostsGrid"),
       "You haven't posted yet. Tap + to share your first post."
@@ -2297,6 +2401,294 @@ $("cameraCallBtn").onclick = () => {
   $("cameraCallBtn").textContent = cameraOff ? "Camera on" : "Camera off";
 };
 
+/* ---------- Saved posts ---------- */
+
+let mySaved = new Set();
+let ownTab = "posts";
+
+async function loadMySaved() {
+  const { data, error } = await db.from("saved_posts").select("post_id").eq("user_id", currentUser.id);
+  if (error) { console.warn("Saved posts:", error.message); return; }
+  mySaved = new Set((data || []).map(r => r.post_id));
+}
+
+async function loadSavedGrid() {
+  const empty = "Tap the bookmark on a post to save it here.";
+  try {
+    const { data, error } = await db.from("saved_posts").select("post_id")
+      .eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(60);
+    if (error) throw error;
+    const ids = (data || []).map(r => r.post_id);
+    if (!ids.length) { renderGrid([], $("ownPostsGrid"), empty); return; }
+    const posts = await db.from("posts").select(POST_COLS).in("id", ids);
+    if (posts.error) throw posts.error;
+    const order = new Map(ids.map((id, i) => [id, i]));
+    renderGrid(posts.data.sort((a, b) => order.get(a.id) - order.get(b.id)), $("ownPostsGrid"), empty);
+  } catch (error) {
+    status("dashboardStatus", "Could not load saved posts: " + error.message);
+  }
+}
+
+function setOwnTab(tab) {
+  ownTab = tab;
+  $("tabMine").classList.toggle("active", tab === "posts");
+  $("tabSaved").classList.toggle("active", tab === "saved");
+  if (tab === "saved") loadSavedGrid(); else loadOwnProfile();
+}
+$("tabMine").onclick = () => setOwnTab("posts");
+$("tabSaved").onclick = () => setOwnTab("saved");
+
+/* ---------- Notifications (rows are created by database triggers) ---------- */
+
+let notifChannel = null;
+
+async function refreshBell() {
+  if (!currentUser) return;
+  const { count } = await db.from("notifications").select("*", { count: "exact", head: true })
+    .eq("user_id", currentUser.id).eq("is_read", false);
+  $("bellDot").classList.toggle("hidden", !count);
+}
+
+async function subscribeNotifications() {
+  if (notifChannel) await db.removeChannel(notifChannel);
+  notifChannel = db.channel("notif-" + currentUser.id).on("postgres_changes", {
+    event: "INSERT", schema: "public", table: "notifications",
+    filter: "user_id=eq." + currentUser.id
+  }, () => {
+    refreshBell();
+    if (!$("notifPanel").classList.contains("hidden")) loadNotifications();
+  }).subscribe();
+}
+
+async function loadNotifications() {
+  const box = $("notifList");
+  box.replaceChildren(emptyEl("Loading…"));
+  try {
+    const { data, error } = await db.from("notifications")
+      .select("id,actor_id,post_id,type,message,is_read,created_at")
+      .eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(50);
+    if (error) throw error;
+    if (!data.length) { box.replaceChildren(emptyEl("No notifications yet.")); return; }
+
+    const profiles = await loadPublicProfiles(data.map(n => n.actor_id));
+    box.replaceChildren();
+    data.forEach(n => {
+      const p = profiles.get(n.actor_id);
+      const name = p?.full_name || "Someone";
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "member notif" + (n.is_read ? "" : " unread");
+      const text = document.createElement("div");
+      text.className = "member-details";
+      const line = document.createElement("span");
+      line.textContent = name + " " + (n.message || n.type);
+      const when = document.createElement("span");
+      when.className = "post-meta";
+      when.textContent = timeAgo(n.created_at);
+      text.append(line, when);
+      row.append(avatar(name, p?.avatar_url), text);
+      row.onclick = async () => {
+        if (n.post_id) {
+          const { data: post } = await db.from("posts").select(POST_COLS).eq("id", n.post_id).maybeSingle();
+          if (post) openPostModal(post); else toast("This post is no longer available.");
+        } else if (n.actor_id) openMemberProfile(n.actor_id);
+      };
+      box.append(row);
+    });
+
+    const unread = data.filter(n => !n.is_read).map(n => n.id);
+    if (unread.length) {
+      await db.from("notifications").update({ is_read: true }).in("id", unread);
+      $("bellDot").classList.add("hidden");
+    }
+  } catch (error) {
+    box.replaceChildren(emptyEl("Could not load notifications: " + error.message));
+  }
+}
+$("bellBtn").onclick = () => showPage("notifications");
+
+/* ---------- Stories (24 hours, you + people you follow) ---------- */
+
+let storyGroups = [];
+let seenStories = new Set();
+const sv = { g: 0, i: 0, timer: null };
+
+async function loadStories() {
+  if (!currentUser) return;
+  try {
+    const ids = [currentUser.id, ...myFollowing];
+    const [stories, seen] = await Promise.all([
+      db.from("stories").select("id,user_id,media_url,media_type,caption,created_at")
+        .in("user_id", ids).gt("expires_at", new Date().toISOString())
+        .order("created_at", { ascending: true }),
+      db.from("story_views").select("story_id").eq("viewer_id", currentUser.id)
+    ]);
+    if (stories.error) throw stories.error;
+    seenStories = new Set((seen.data || []).map(r => r.story_id));
+
+    const byUser = new Map();
+    stories.data.forEach(st => {
+      if (!byUser.has(st.user_id)) byUser.set(st.user_id, []);
+      byUser.get(st.user_id).push(st);
+    });
+    const profiles = await loadPublicProfiles([...byUser.keys()]);
+    const unseen = g => g.items.some(st => !seenStories.has(st.id));
+
+    storyGroups = [...byUser].map(([uid, items]) => ({ uid, items, profile: profiles.get(uid) }))
+      .sort((a, b) => (a.uid === currentUser.id ? -1 : b.uid === currentUser.id ? 1 : unseen(b) - unseen(a)));
+    renderStoriesBar();
+  } catch (error) {
+    console.warn("Stories:", error.message);
+    $("storiesBar").replaceChildren();
+  }
+}
+
+function storyItem(label, name, url, ring, onOpen, plus) {
+  const item = document.createElement("button");
+  item.type = "button";
+  item.className = "story-item";
+  const ringEl = document.createElement("div");
+  ringEl.className = "story-ring " + ring;
+  ringEl.append(avatar(name, url));
+  const lbl = document.createElement("span");
+  lbl.className = "lbl";
+  lbl.textContent = label;
+  item.append(ringEl, lbl);
+  if (plus) {
+    const badge = document.createElement("span");
+    badge.className = "story-plus";
+    badge.textContent = "+";
+    badge.onclick = e => { e.stopPropagation(); $("storyFile").click(); };
+    item.append(badge);
+  }
+  item.onclick = onOpen;
+  return item;
+}
+
+function renderStoriesBar() {
+  const bar = $("storiesBar");
+  bar.replaceChildren();
+  const mine = storyGroups.findIndex(g => g.uid === currentUser.id);
+  bar.append(storyItem("Your story", currentProfile?.full_name, currentProfile?.avatar_url,
+    mine >= 0 ? "seen" : "none",
+    () => (mine >= 0 ? openStory(mine) : $("storyFile").click()), true));
+
+  storyGroups.forEach((g, idx) => {
+    if (g.uid === currentUser.id) return;
+    const fresh = g.items.some(st => !seenStories.has(st.id));
+    bar.append(storyItem(g.profile?.full_name || "Member", g.profile?.full_name,
+      g.profile?.avatar_url, fresh ? "" : "seen", () => openStory(idx)));
+  });
+}
+
+$("storyFile").addEventListener("change", async () => {
+  const file = $("storyFile").files[0];
+  $("storyFile").value = "";
+  if (!file || !currentUser) return;
+
+  const isVideo = file.type.startsWith("video/");
+  if (file.size > (isVideo ? 25 : 8) * 1024 * 1024) { toast(isVideo ? "Videos must be 25 MB or smaller." : "Images must be 8 MB or smaller."); return; }
+
+  try {
+    toast("Uploading story…");
+    const ext = (file.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const path = currentUser.id + "/stories/" + Date.now() + "." + ext;
+    const up = await db.storage.from("post-media").upload(path, file, { contentType: file.type, upsert: false });
+    if (up.error) throw up.error;
+    const url = db.storage.from("post-media").getPublicUrl(path).data.publicUrl;
+    const ins = await db.from("stories").insert({ user_id: currentUser.id, media_url: url, media_type: isVideo ? "video" : "image" });
+    if (ins.error) throw ins.error;
+    toast("Story added. It disappears in 24 hours.");
+    loadStories();
+  } catch (error) {
+    toast("Could not add story: " + error.message);
+  }
+});
+
+function openStory(groupIndex, itemIndex = 0) {
+  sv.g = groupIndex; sv.i = itemIndex;
+  $("storyViewer").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  showStory();
+}
+
+function showStory() {
+  clearTimeout(sv.timer);
+  const group = storyGroups[sv.g];
+  const st = group.items[sv.i];
+
+  $("storyBars").innerHTML = group.items
+    .map((_, k) => '<i class="' + (k < sv.i ? "done" : k === sv.i ? "now" : "") + '"></i>').join("");
+  const nowBar = $("storyBars").children[sv.i];
+
+  $("storyWho").textContent = (group.profile?.full_name || "Member") + " · " + timeAgo(st.created_at);
+  hide("storyDelete", group.uid !== currentUser.id);
+
+  let media;
+  if (st.media_type === "video") {
+    media = document.createElement("video");
+    media.autoplay = true; media.playsInline = true;
+    media.onended = nextStory;
+    media.onloadedmetadata = () => nowBar?.style.setProperty("--dur", media.duration + "s");
+  } else {
+    media = document.createElement("img");
+    media.alt = "Story";
+    sv.timer = setTimeout(nextStory, 5000);
+  }
+  media.src = st.media_url;
+  $("storyStage").replaceChildren(media);
+
+  if (!seenStories.has(st.id)) {
+    seenStories.add(st.id);
+    db.from("story_views").upsert({ story_id: st.id, viewer_id: currentUser.id },
+      { onConflict: "story_id,viewer_id", ignoreDuplicates: true }).then(() => {});
+  }
+}
+
+function nextStory() {
+  const group = storyGroups[sv.g];
+  if (sv.i < group.items.length - 1) { sv.i++; showStory(); }
+  else if (sv.g < storyGroups.length - 1) { sv.g++; sv.i = 0; showStory(); }
+  else closeStory();
+}
+
+function prevStory() {
+  if (sv.i > 0) sv.i--;
+  else if (sv.g > 0) { sv.g--; sv.i = 0; }
+  showStory();
+}
+
+function closeStory() {
+  if ($("storyViewer").classList.contains("hidden")) return;
+  clearTimeout(sv.timer);
+  $("storyStage").replaceChildren();
+  $("storyViewer").classList.add("hidden");
+  document.body.style.overflow = "";
+  renderStoriesBar();
+}
+
+$("storyStage").onclick = event => {
+  const box = event.currentTarget.getBoundingClientRect();
+  if (event.clientX - box.left < box.width / 3) prevStory(); else nextStory();
+};
+$("storyClose").onclick = closeStory;
+document.addEventListener("keydown", event => { if (event.key === "Escape") closeStory(); });
+
+$("storyDelete").onclick = async () => {
+  const st = storyGroups[sv.g].items[sv.i];
+  if (!confirm("Delete this story?")) return;
+  clearTimeout(sv.timer);
+  const { error } = await db.from("stories").delete().eq("id", st.id).eq("user_id", currentUser.id);
+  if (error) { toast("Could not delete story: " + error.message); showStory(); return; }
+  const marker = "/post-media/";
+  if (st.media_url.includes(marker)) {
+    db.storage.from("post-media").remove([decodeURIComponent(st.media_url.split(marker)[1].split("?")[0])]).catch(() => {});
+  }
+  closeStory();
+  toast("Story deleted.");
+  loadStories();
+};
+
 /* ---------- Refresh, logout and startup ---------- */
 
 $("refreshBtn").onclick = async () => {
@@ -2311,6 +2703,9 @@ $("logoutBtn").onclick = async () => {
   if (chatChannel) await db.removeChannel(chatChannel);
   if (incomingChannel) await db.removeChannel(incomingChannel);
 
+  if (notifChannel) await db.removeChannel(notifChannel);
+  notifChannel = null;
+  mySaved = new Set();
   chatChannel = null;
   incomingChannel = null;
 
@@ -2334,7 +2729,7 @@ $("logoutBtn").onclick = async () => {
   [
     "homePanel", "dashboard", "communityMembersPanel",
     "chatPanel", "postsPanel", "adminPanel",
-    "memberProfilePanel", "callPanel"
+    "memberProfilePanel", "callPanel", "notifPanel"
   ].forEach(id => hide(id, true));
 
   status("status", "Logged out successfully.");
@@ -2366,6 +2761,8 @@ loadDashboard().catch(error => {
     const dark = document.body.classList.contains("dark-theme");
     toggle.textContent = dark ? "☀ Light mode" : "☾ Dark mode";
     toggle.setAttribute("aria-pressed", String(dark));
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeMeta) themeMeta.setAttribute("content", dark ? "#16161f" : "#f7f6fb");
   }
   updateLabel();
   toggle.addEventListener("click", () => {
@@ -2374,6 +2771,57 @@ loadDashboard().catch(error => {
     updateLabel();
   });
 })();
+
+/* ---------- Installable app (PWA) ---------- */
+(function setupApp() {
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(error => {
+        console.warn("Service worker not registered:", error.message);
+      });
+    });
+  }
+
+  const installed = window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true;
+  if (installed) return;
+
+  /* Android / Chrome / Edge: show our own Install button. */
+  let installEvent = null;
+  window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    installEvent = event;
+    $("installBtn").classList.remove("hidden");
+  });
+
+  $("installBtn").addEventListener("click", async () => {
+    if (!installEvent) return;
+    installEvent.prompt();
+    await installEvent.userChoice;
+    installEvent = null;
+    $("installBtn").classList.add("hidden");
+  });
+
+  window.addEventListener("appinstalled", () => {
+    $("installBtn").classList.add("hidden");
+    toast("App installed.");
+  });
+
+  /* iPhone Safari has no install prompt, so show a one-time hint. */
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  let hintSeen = false;
+  try { hintSeen = localStorage.getItem("community-hub-ios-hint") === "1"; } catch (_) {}
+  if (isIos && !hintSeen) {
+    $("iosHint").classList.remove("hidden");
+    $("iosHintClose").onclick = () => {
+      $("iosHint").classList.add("hidden");
+      try { localStorage.setItem("community-hub-ios-hint", "1"); } catch (_) {}
+    };
+  }
+})();
+
+window.addEventListener("offline", () => toast("You are offline. Posts and chat need internet."));
+window.addEventListener("online", () => toast("Back online."));
 </script>
 </body>
 </html>
