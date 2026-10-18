@@ -302,6 +302,20 @@ body #authCard{max-width:350px;margin:24px auto;padding:28px 40px;border:1px sol
 #toggleBtn{background:none;color:var(--brand);margin-top:8px}
 @media(max-width:420px){body #authCard{border:0;padding:20px 0}}
 
+/* ---------- Settings ---------- */
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+#settingsPanel h3{margin:24px 0 8px}
+
+/* ---------- Reels ---------- */
+#reelsPanel{position:fixed;left:0;right:0;top:calc(56px + env(safe-area-inset-top));bottom:calc(55px + env(safe-area-inset-bottom));z-index:30;background:#000;overflow-y:auto;scroll-snap-type:y mandatory}
+.reel{position:relative;height:100%;max-width:480px;margin:auto;background:#000;scroll-snap-align:start;scroll-snap-stop:always}
+.reel video{width:100%;height:100%;object-fit:contain;border-radius:0;background:#000}
+.reel-info{position:absolute;left:12px;right:72px;bottom:16px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7);overflow-wrap:anywhere}
+.reel-info .name-link,.reel-info .tag-link{color:#fff;font-size:16px}
+.reel-like{position:absolute;right:10px;bottom:24px;border:0;background:none;color:#fff;display:flex;flex-direction:column;align-items:center;font-weight:700;font-size:13px}
+.reel-like svg{width:34px;height:34px}
+.reel-like.liked{color:var(--like)}
+
 /* ---------- Post viewer and toast ---------- */
 .modal{position:fixed;inset:0;z-index:2000;background:rgba(10,10,20,.62);overflow:auto;padding:16px 12px 40px}
 .modal-body{width:min(100%,560px);margin:0 auto}
@@ -390,6 +404,7 @@ body #authCard{max-width:350px;margin:24px auto;padding:28px 40px;border:1px sol
     <div class="profile-main">
       <h2 id="welcome">Your profile</h2>
       <p class="muted" id="accountEmail" style="margin:2px 0 0;font-size:14px"></p>
+      <p id="ownBio" style="font-size:14px;white-space:pre-wrap"></p>
       <span class="badge" id="roleText">Member</span>
       <div class="stats">
         <div class="stat"><b id="ownPostCount">0</b><span>posts</span></div>
@@ -400,9 +415,7 @@ body #authCard{max-width:350px;margin:24px auto;padding:28px 40px;border:1px sol
   </div>
 
   <div class="action-row profile-actions">
-    <button class="btn secondary" id="refreshBtn">Refresh</button>
-    <button class="btn secondary" id="themeBtn2" type="button">◐ Theme</button>
-    <button class="btn danger" id="logoutBtn">Log out</button>
+    <button class="btn secondary" id="settingsBtn" type="button">⚙ Settings</button>
   </div>
 
   <details class="edit-avatar">
@@ -410,7 +423,13 @@ body #authCard{max-width:350px;margin:24px auto;padding:28px 40px;border:1px sol
     <input class="field" id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp">
     <button class="btn secondary full-width" id="uploadAvatarBtn">Upload picture</button>
   </details>
-  <div class="swatches" id="accentPicker" role="group" aria-label="Accent colour"></div>
+  <details class="edit-avatar">
+    <summary>Edit name, username and bio</summary>
+    <input class="field" id="editName" maxlength="40" placeholder="Name">
+    <input class="field" id="editUsername" maxlength="20" placeholder="username (letters, numbers, . and _)" autocapitalize="none">
+    <textarea class="field" id="editBio" maxlength="150" placeholder="Bio"></textarea>
+    <button class="btn full-width" id="saveProfileBtn" type="button">Save profile</button>
+  </details>
   <p id="profileStatus" class="status muted"></p>
   <p id="dashboardStatus" class="status muted"></p>
 
@@ -468,6 +487,32 @@ body #authCard{max-width:350px;margin:24px auto;padding:28px 40px;border:1px sol
   <select class="hidden" id="chatMember" aria-hidden="true"><option value="">Choose a member</option></select>
   <button class="hidden" id="loadChatBtn" type="button" tabindex="-1">Open</button>
 </section>
+
+<!-- Settings -->
+<section class="panel hidden" id="settingsPanel">
+  <div class="section-top"><button class="btn secondary" id="settingsBack" type="button">← Back</button><h2>Settings</h2></div>
+
+  <h3>Appearance</h3>
+  <div class="set-row"><span>Dark mode</span><button class="small-btn" id="themeBtn2" type="button">Switch</button></div>
+  <div class="swatches" id="accentPicker" role="group" aria-label="Accent colour"></div>
+
+  <h3>Account</h3>
+  <p class="muted" id="settingsEmail" style="margin:0 0 8px"></p>
+  <form id="passwordForm" class="post-form">
+    <input class="field" id="newPassword" type="password" minlength="6" autocomplete="new-password" placeholder="New password (at least 6 characters)">
+    <input class="field" id="newPassword2" type="password" minlength="6" autocomplete="new-password" placeholder="Confirm new password" style="margin-top:8px">
+    <button class="btn full-width" id="passwordBtn" type="submit">Change password</button>
+  </form>
+
+  <h3>App</h3>
+  <button class="btn secondary full-width" id="refreshBtn" type="button">Refresh my data</button>
+  <p class="muted" style="font-size:13px">Community Hub · version 1.0</p>
+
+  <button class="btn danger full-width" id="logoutBtn" type="button" style="margin-top:20px">Log out</button>
+</section>
+
+<!-- Reels -->
+<section class="hidden" id="reelsPanel" aria-label="Reels"></section>
 
 <!-- Notifications -->
 <section class="panel hidden" id="notifPanel">
@@ -563,7 +608,7 @@ body #authCard{max-width:350px;margin:24px auto;padding:28px 40px;border:1px sol
     <button class="nav-tab active" data-page="home" aria-label="Home" title="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></button>
     <button class="nav-tab" data-page="explore" aria-label="Explore" title="Explore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
     <button class="nav-tab" data-page="create" aria-label="Create" title="Create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg></button>
-    <button class="nav-tab" data-page="messages" aria-label="Messages" title="Messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3 11 14"/><path d="M22 3l-7 19-4-8-8-4z"/></svg></button>
+    <button class="nav-tab" data-page="reels" aria-label="Reels" title="Reels"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 9h18M9 3l3 6M15 3l3 6"/><path d="M10 13.5v4l3.5-2z"/></svg></button>
     <button class="nav-tab" data-page="profile" aria-label="Profile" title="Profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
   </div>
 </nav>
@@ -722,9 +767,12 @@ function setPageVisibility(page) {
     create: "postsPanel",
     messages: "chatPanel",
     profile: "dashboard",
+    reels: "reelsPanel",
+    settings: "settingsPanel",
     notifications: "notifPanel"
   };
 
+  pauseReels();
   Object.values(pages).forEach(id => hide(id, true));
   hide("adminPanel", true);
   hide("memberProfilePanel", true);
@@ -749,6 +797,8 @@ function showPage(page) {
   if (page === "messages") { showChatList(); loadChatMembers(); }
   if (page === "home") { loadHomeFeed(); loadStories(); }
   if (page === "notifications") loadNotifications();
+  if (page === "reels") loadReels();
+  if (page === "settings") $("settingsEmail").textContent = "Signed in as " + (currentUser.email || "");
   if (page === "explore") loadExplore();
   if (page === "profile") loadOwnProfile();
 
@@ -856,7 +906,7 @@ async function loadDashboard() {
       [
         "homePanel", "dashboard", "communityMembersPanel",
         "chatPanel", "postsPanel", "adminPanel",
-        "memberProfilePanel", "callPanel", "notifPanel"
+        "memberProfilePanel", "callPanel", "notifPanel", "reelsPanel", "settingsPanel"
       ].forEach(id => hide(id, true));
 
       return;
@@ -867,7 +917,7 @@ async function loadDashboard() {
 
     const { data: profile, error: profileError } = await db
       .from("profiles")
-      .select("id,full_name,email,is_admin,avatar_url")
+      .select("id,full_name,email,is_admin,avatar_url,bio,username")
       .eq("id", currentUser.id)
       .maybeSingle();
 
@@ -892,6 +942,10 @@ async function loadDashboard() {
     $("roleText").textContent = profile.is_admin
       ? "Administrator" : "Community Member";
     $("homeWelcome").textContent = "Welcome, " + name + " ✦";
+    $("editName").value = profile.full_name || "";
+    $("editUsername").value = profile.username || "";
+    $("editBio").value = profile.bio || "";
+    paintOwnBio();
 
     replaceAvatar("profileAvatar", name, profile.avatar_url);
 
@@ -918,16 +972,22 @@ async function loadDashboard() {
   }
 }
 
+let profileCols = "user_id,full_name,avatar_url,created_at,bio,username";
+
 async function loadPublicProfiles(ids) {
   const map = new Map();
   const uniqueIds = [...new Set(ids.filter(Boolean))];
   if (!uniqueIds.length) return map;
 
-  const { data, error } = await db
-    .from("member_public_profiles")
-    .select("user_id,full_name,avatar_url,created_at")
-    .in("user_id", uniqueIds);
+  let { data, error } = await db
+    .from("member_public_profiles").select(profileCols).in("user_id", uniqueIds);
 
+  /* Until the bio/username SQL is run, fall back to the old columns. */
+  if (error && profileCols.includes("bio")) {
+    profileCols = "user_id,full_name,avatar_url,created_at";
+    ({ data, error } = await db
+      .from("member_public_profiles").select(profileCols).in("user_id", uniqueIds));
+  }
   if (error) throw error;
   (data || []).forEach(profile => map.set(profile.user_id, profile));
   return map;
@@ -1639,7 +1699,8 @@ async function openMemberProfile(userId) {
     if (postsResult.error) throw postsResult.error;
 
     $("memberProfileName").textContent = profile.full_name || "Community member";
-    $("memberProfileBio").textContent = "Community member";
+    $("memberProfileBio").textContent =
+      [profile.username ? "@" + profile.username : "", profile.bio].filter(Boolean).join(" · ") || "Community member";
     replaceAvatar("memberProfileAvatar", profile.full_name, profile.avatar_url);
 
     $("memberPostCount").textContent = counts.posts;
@@ -2993,11 +3054,167 @@ $("chatBack").onclick = showChatList;
 $("dmBtn").onclick = () => showPage("messages");
 $("themeBtn2").onclick = () => $("themeToggle").click();
 
+/* ---------- Bio and username ---------- */
+
+function paintOwnBio() {
+  const p = currentProfile || {};
+  $("ownBio").textContent = [p.username ? "@" + p.username : "", p.bio].filter(Boolean).join(" · ");
+}
+
+$("saveProfileBtn").onclick = async () => {
+  const full_name = $("editName").value.trim();
+  const username = $("editUsername").value.trim().toLowerCase();
+  const bio = $("editBio").value.trim();
+
+  if (!full_name) { toast("Name cannot be empty."); return; }
+  if (username && !/^[a-z0-9._]{3,20}$/.test(username)) {
+    toast("Username: 3-20 letters, numbers, . or _"); return;
+  }
+
+  $("saveProfileBtn").disabled = true;
+  const { data, error } = await db.from("profiles")
+    .update({ full_name, username: username || null, bio })
+    .eq("id", currentUser.id)
+    .select("id,full_name,email,is_admin,avatar_url,bio,username").single();
+  $("saveProfileBtn").disabled = false;
+
+  if (error) {
+    toast(/duplicate|unique/i.test(error.message) ? "That username is taken." : "Could not save: " + error.message);
+    return;
+  }
+  currentProfile = data;
+  $("welcome").textContent = data.full_name;
+  paintOwnBio();
+  toast("Profile saved.");
+};
+
+/* ---------- Reels: vertical video feed (all video posts) ---------- */
+
+let reelsMuted = true;
+let reelObserver = null;
+
+function pauseReels() {
+  document.querySelectorAll(".reel video").forEach(v => v.pause());
+}
+
+function buildReel(post, profiles, m) {
+  const el = document.createElement("div");
+  el.className = "reel";
+
+  const video = document.createElement("video");
+  video.src = post.media_url;
+  video.loop = true;
+  video.muted = reelsMuted;
+  video.playsInline = true;
+  video.preload = "metadata";
+  video.onclick = () => {
+    reelsMuted = !reelsMuted;
+    document.querySelectorAll(".reel video").forEach(v => { v.muted = reelsMuted; });
+    toast(reelsMuted ? "Sound off" : "Sound on");
+  };
+
+  const info = document.createElement("div");
+  info.className = "reel-info";
+  const name = document.createElement("button");
+  name.className = "name-link";
+  name.textContent = profiles.get(post.user_id)?.full_name || "Community member";
+  name.onclick = () => openMemberProfile(post.user_id);
+  info.append(name);
+  if (post.content) {
+    info.append(document.createElement("br"));
+    addRichText(info, post.content);
+  }
+
+  const like = document.createElement("button");
+  like.className = "reel-like";
+  like.type = "button";
+  const paint = () => {
+    const liked = m.likes.has(currentUser.id);
+    like.innerHTML = (liked ? ICON.heartFill : ICON.heart) + "<span>" + m.likes.size + "</span>";
+    like.classList.toggle("liked", liked);
+    like.setAttribute("aria-label", liked ? "Unlike" : "Like");
+  };
+  like.onclick = async () => {
+    const had = m.likes.has(currentUser.id);
+    if (had) m.likes.delete(currentUser.id); else m.likes.add(currentUser.id);
+    paint();
+    try {
+      const r = had
+        ? await db.from("post_likes").delete().eq("post_id", post.id).eq("user_id", currentUser.id)
+        : await db.from("post_likes").insert({ post_id: post.id, user_id: currentUser.id });
+      if (r.error) throw r.error;
+    } catch (error) {
+      if (had) m.likes.add(currentUser.id); else m.likes.delete(currentUser.id);
+      paint();
+      toast("Could not update like: " + error.message);
+    }
+  };
+  paint();
+
+  el.append(video, info, like);
+  return el;
+}
+
+async function loadReels() {
+  const box = $("reelsPanel");
+  box.replaceChildren();
+  try {
+    const { data, error } = await db.from("posts").select(POST_COLS)
+      .eq("media_type", "video").order("created_at", { ascending: false }).limit(20);
+    if (error) throw error;
+
+    if (!data.length) {
+      const empty = emptyEl("No videos yet. Share a video with + and it shows up here.");
+      empty.style.color = "#fff";
+      box.append(empty);
+      return;
+    }
+
+    const { meta, profiles } = await loadPostMeta(data);
+    if (reelObserver) reelObserver.disconnect();
+    reelObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+      const video = entry.target.querySelector("video");
+      if (entry.isIntersecting) { video.muted = reelsMuted; video.play().catch(() => {}); }
+      else video.pause();
+    }), { root: box, threshold: 0.65 });
+
+    data.forEach(post => {
+      const reel = buildReel(post, profiles, meta.get(post.id) || { likes: new Set(), comments: [] });
+      box.append(reel);
+      reelObserver.observe(reel);
+    });
+  } catch (error) {
+    box.replaceChildren(emptyEl("Could not load reels: " + error.message));
+  }
+}
+
+/* ---------- Settings ---------- */
+
+$("settingsBtn").onclick = () => showPage("settings");
+$("settingsBack").onclick = () => showPage("profile");
+
+$("passwordForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const a = $("newPassword").value;
+  const b = $("newPassword2").value;
+  if (a.length < 6) { toast("Password must be at least 6 characters."); return; }
+  if (a !== b) { toast("Passwords do not match."); return; }
+
+  $("passwordBtn").disabled = true;
+  const { error } = await db.auth.updateUser({ password: a });
+  $("passwordBtn").disabled = false;
+
+  if (error) { toast("Could not change password: " + error.message); return; }
+  $("newPassword").value = "";
+  $("newPassword2").value = "";
+  toast("Password changed.");
+});
+
 /* ---------- Refresh, logout and startup ---------- */
 
 $("refreshBtn").onclick = async () => {
   await loadOwnProfile();
-  status("dashboardStatus", "Refreshed.");
+  toast("Refreshed.");
 };
 
 $("logoutBtn").onclick = async () => {
@@ -3033,7 +3250,7 @@ $("logoutBtn").onclick = async () => {
   [
     "homePanel", "dashboard", "communityMembersPanel",
     "chatPanel", "postsPanel", "adminPanel",
-    "memberProfilePanel", "callPanel", "notifPanel"
+    "memberProfilePanel", "callPanel", "notifPanel", "reelsPanel", "settingsPanel"
   ].forEach(id => hide(id, true));
 
   status("status", "Logged out successfully.");
