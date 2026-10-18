@@ -242,6 +242,34 @@ body.dark-theme[data-accent=blue]{--brand:#7db4ff;--brand-soft:#1c2c47}
 .chip.tag{color:var(--brand)}
 .tag-link{border:0;background:none;padding:0;color:var(--brand);font:inherit;font-weight:650}
 
+/* ---------- Instagram look ---------- */
+.brand{font-style:italic;letter-spacing:-.04em}
+#homeWelcome{display:none}
+#bellBtn,#dmBtn{display:none;position:relative}
+body.app-mode #bellBtn,body.app-mode #dmBtn{display:grid}
+body.app-mode .nav-actions .theme-toggle{display:none}
+.nav-tab.active{color:var(--text)}
+.nav-tab[data-page=home].active svg path{fill:currentColor}
+.stories{border-bottom:1px solid var(--border);margin-bottom:6px}
+.post-card{background:transparent;border:0;border-bottom:1px solid var(--border);border-radius:0;margin-bottom:6px;padding-bottom:6px;overflow:visible}
+.post-media-wrap,.post-media{border-radius:0}
+.post-time{display:block;padding:4px 14px 0;font-size:12px}
+@media(max-width:664px){#homePanel .post-card,#homePanel .stories{margin-left:-12px;margin-right:-12px}#homePanel .stories{padding-left:12px}}
+.profile-head{display:grid;grid-template-columns:auto 1fr;gap:4px 22px;align-items:center}
+.profile-main{display:contents}
+.profile-head .avatar{grid-column:1;grid-row:1}
+.profile-head .stats{grid-column:2;grid-row:1;justify-content:space-around;gap:8px;margin:0}
+.profile-head h2,.profile-head p,.profile-head .badge{grid-column:1/-1;margin:0}
+.profile-head .badge{justify-self:start}
+.stat{align-items:center;text-align:center}
+.profile-actions .btn{flex:1;min-width:0}
+.post-grid{gap:2px}
+.profile-tabs{display:flex;border-top:1px solid var(--border);margin-top:18px}
+.ptab{flex:1;height:46px;border:0;border-top:2px solid transparent;margin-top:-1px;background:none;color:var(--muted);display:grid;place-items:center}
+.ptab svg{width:24px;height:24px}
+.ptab.active{color:var(--text);border-top-color:var(--text)}
+#chatWith{font-size:16px}
+
 /* ---------- Post viewer and toast ---------- */
 .modal{position:fixed;inset:0;z-index:2000;background:rgba(10,10,20,.62);overflow:auto;padding:16px 12px 40px}
 .modal-body{width:min(100%,560px);margin:0 auto}
@@ -266,6 +294,7 @@ body.dark-theme[data-accent=blue]{--brand:#7db4ff;--brand-soft:#1c2c47}
     <div class="brand"><span class="brand-mark" aria-hidden="true">✦</span><span>Community Hub</span></div>
     <div class="nav-actions">
       <button class="icon-btn" id="bellBtn" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot hidden" id="bellDot"></span></button>
+      <button class="icon-btn" id="dmBtn" type="button" aria-label="Messages" title="Messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3 11 14"/><path d="M22 3l-7 19-4-8-8-4z"/></svg></button>
       <button class="install-btn hidden" id="installBtn" type="button">Install app</button>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme">☾ Dark mode</button>
     </div>
@@ -339,6 +368,7 @@ body.dark-theme[data-accent=blue]{--brand:#7db4ff;--brand-soft:#1c2c47}
 
   <div class="action-row profile-actions">
     <button class="btn secondary" id="refreshBtn">Refresh</button>
+    <button class="btn secondary" id="themeBtn2" type="button">◐ Theme</button>
     <button class="btn danger" id="logoutBtn">Log out</button>
   </div>
 
@@ -352,7 +382,10 @@ body.dark-theme[data-accent=blue]{--brand:#7db4ff;--brand-soft:#1c2c47}
   <p id="dashboardStatus" class="status muted"></p>
 
   <div id="ownProfileList" class="member-list"></div>
-  <div class="tabs" style="margin-top:20px"><button class="tab active" id="tabMine" type="button">Posts</button><button class="tab" id="tabSaved" type="button">Saved</button></div>
+  <div class="profile-tabs">
+    <button class="ptab active" id="tabMine" type="button" aria-label="Posts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button>
+    <button class="ptab" id="tabSaved" type="button" aria-label="Saved"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+  </div>
   <div id="ownPostsGrid" class="post-grid"></div>
 </section>
 
@@ -386,19 +419,21 @@ body.dark-theme[data-accent=blue]{--brand:#7db4ff;--brand-soft:#1c2c47}
 
 <!-- Messages -->
 <section class="panel hidden" id="chatPanel">
-  <h2>Messages</h2>
-  <label class="field-label" for="chatMember">Choose a member</label>
-  <select class="field" id="chatMember">
-    <option value="">Choose a member</option>
-  </select>
-  <button class="btn secondary full-width" id="loadChatBtn">Open conversation</button>
-  <p id="chatWith" class="muted"></p>
-  <div id="chatMessages" class="chat-scroll"></div>
-  <form id="chatForm" class="post-form">
-    <textarea class="field" id="chatMessage" maxlength="2000" required placeholder="Write a message"></textarea>
-    <button class="btn full-width" id="sendChatBtn" type="submit">Send</button>
-  </form>
-  <p id="chatStatus" class="status muted"></p>
+  <div id="chatListView">
+    <h2>Messages</h2>
+    <div id="chatList" class="member-list"></div>
+  </div>
+  <div id="chatThread" class="hidden">
+    <div class="section-top"><button class="btn secondary" id="chatBack" type="button">← Back</button><strong id="chatWith"></strong></div>
+    <div id="chatMessages" class="chat-scroll"></div>
+    <form id="chatForm" class="post-form">
+      <textarea class="field" id="chatMessage" maxlength="2000" required placeholder="Message…"></textarea>
+      <button class="btn full-width" id="sendChatBtn" type="submit">Send</button>
+    </form>
+    <p id="chatStatus" class="status muted"></p>
+  </div>
+  <select class="hidden" id="chatMember" aria-hidden="true"><option value="">Choose a member</option></select>
+  <button class="hidden" id="loadChatBtn" type="button" tabindex="-1">Open</button>
 </section>
 
 <!-- Notifications -->
@@ -586,6 +621,18 @@ function timeAgo(value) {
   return new Date(value).toLocaleDateString(undefined, { day: "numeric", month: "short" });
 }
 
+function timeAgoLong(value) {
+  const s = Math.max(1, Math.floor((Date.now() - new Date(value)) / 1000));
+  if (s < 60) return "Just now";
+  const m = Math.floor(s / 60);
+  if (m < 60) return m + (m === 1 ? " minute ago" : " minutes ago");
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + (h === 1 ? " hour ago" : " hours ago");
+  const d = Math.floor(h / 24);
+  if (d < 7) return d + (d === 1 ? " day ago" : " days ago");
+  return new Date(value).toLocaleDateString(undefined, { day: "numeric", month: "long" });
+}
+
 function emptyEl(text, actionLabel, onAction) {
   const box = document.createElement("div");
   box.className = "empty";
@@ -666,7 +713,7 @@ function showPage(page) {
   hide("callPanel", true);
   setPageVisibility(page);
 
-  if (page === "messages") loadChatMembers();
+  if (page === "messages") { showChatList(); loadChatMembers(); }
   if (page === "home") { loadHomeFeed(); loadStories(); }
   if (page === "notifications") loadNotifications();
   if (page === "explore") loadExplore();
@@ -961,7 +1008,7 @@ function buildPostCard(post, profiles, m) {
   time.textContent = timeAgo(post.created_at);
   time.title = new Date(post.created_at).toLocaleString();
 
-  who.append(nameButton, time);
+  who.append(nameButton);
   head.append(av, who);
 
   if (currentUser && post.user_id === currentUser.id) {
@@ -1167,7 +1214,9 @@ function buildPostCard(post, profiles, m) {
     input.focus();
   };
 
-  card.append(viewAll, commentsBox, form);
+  time.className = "post-meta post-time";
+  time.textContent = timeAgoLong(post.created_at);
+  card.append(viewAll, commentsBox, time, form);
 
   /* Likes: updates instantly, rolls back if the server refuses */
   function renderLikes() {
@@ -1837,6 +1886,7 @@ async function loadChatMembers() {
   const previous = select.value;
 
   select.replaceChildren();
+  $("chatList").replaceChildren();
 
   const first = document.createElement("option");
   first.value = "";
@@ -1846,7 +1896,7 @@ async function loadChatMembers() {
   try {
     const { data, error } = await db
       .from("member_public_profiles")
-      .select("user_id,full_name")
+      .select("user_id,full_name,avatar_url")
       .order("full_name");
 
     if (error) throw error;
@@ -1858,6 +1908,15 @@ async function loadChatMembers() {
       option.value = member.user_id;
       option.textContent = member.full_name || "Member";
       select.append(option);
+
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "member notif";
+      const rowName = document.createElement("strong");
+      rowName.textContent = member.full_name || "Member";
+      row.append(avatar(member.full_name, member.avatar_url), rowName);
+      row.onclick = () => { select.value = member.user_id; openConversation(); };
+      $("chatList").append(row);
     });
 
     if (previous) select.value = previous;
@@ -1878,8 +1937,9 @@ async function openConversation() {
     return;
   }
 
-  $("chatWith").textContent =
-    "Conversation with " + $("chatMember").selectedOptions[0].textContent;
+  $("chatWith").textContent = $("chatMember").selectedOptions[0].textContent;
+  hide("chatListView", true);
+  hide("chatThread", false);
 
   await loadMessages();
   await subscribeToChat();
@@ -2889,6 +2949,16 @@ function setAccent(name) {
   try { saved = localStorage.getItem("community-hub-accent") || "purple"; } catch (_) {}
   setAccent(ACCENTS[saved] ? saved : "purple");
 })();
+
+/* ---------- Instagram-style header and chat list ---------- */
+
+function showChatList() {
+  hide("chatListView", false);
+  hide("chatThread", true);
+}
+$("chatBack").onclick = showChatList;
+$("dmBtn").onclick = () => showPage("messages");
+$("themeBtn2").onclick = () => $("themeToggle").click();
 
 /* ---------- Refresh, logout and startup ---------- */
 
